@@ -19,12 +19,14 @@ const authSlice = createSlice({
     login(state, action) {
       state.isAuth = true;
 
-      const { accountId, token } = action.payload;
+      const { accountId, token, user } = action.payload;
 
       const remainingMilliseconds = 60 * 60 * 1000;
       const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
       Cookies.set("token", token, { expires: expiryDate });
       Cookies.set("accountId", accountId, { expires: expiryDate });
+
+      state.currentUser = user;
     },
     logout(state) {
       state.isAuth = false;
@@ -42,5 +44,6 @@ const authSlice = createSlice({
 export const { login, logout } = authSlice.actions;
 
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
+export const selectCurrentUser = (state) => state.auth.currentUser;
 
 export default authSlice.reducer;
