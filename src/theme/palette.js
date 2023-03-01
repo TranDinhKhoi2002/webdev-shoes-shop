@@ -5,7 +5,7 @@ const GREY = {
 };
 
 const PRIMARY = {
-  main: "#fafafa",
+  main: "#e7e7e7",
 };
 
 const SECONDARY = {

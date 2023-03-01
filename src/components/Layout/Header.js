@@ -43,13 +43,13 @@ function ElevationScroll(props) {
 const useStyles = makeStyles((theme) => ({
   toolbarMargin: {
     ...theme.mixins.toolbar,
-    marginBottom: `5em`,
-    [theme.breakpoints.down("md")]: {
-      marginBottom: "4em",
-    },
-    [theme.breakpoints.down("xs")]: {
-      marginBottom: "2em",
-    },
+    // marginBottom: `5em`,
+    // [theme.breakpoints.down("md")]: {
+    //   marginBottom: "4em",
+    // },
+    // [theme.breakpoints.down("xs")]: {
+    //   marginBottom: "2em",
+    // },
   },
   logo: {
     color: theme.palette.secondary.main,
@@ -104,7 +104,7 @@ const Header = () => {
             <Link to={link}>
               <Typography
                 className={classes.link}
-                style={{
+                sx={{
                   fontWeight: location.pathname === link && "bold",
                   borderBottom: location.pathname === link && "1px solid #757ce8",
                 }}
@@ -132,7 +132,6 @@ const Header = () => {
             <ListItemButton
               key={link}
               divider
-              button
               onClick={() => {
                 setOpenDrawer(false);
               }}
@@ -172,7 +171,7 @@ const Header = () => {
             }}
           >
             <Link to="/">
-              <Typography className={classes.logo}>Material-UI</Typography>
+              <Typography className={classes.logo}>Little Shop</Typography>
             </Link>
             {matches ? drawer : tabs}
           </Toolbar>
