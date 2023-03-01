@@ -1,3 +1,4 @@
+import MainLayout from "@/layout/MainLayout";
 import { selectCurrentUser } from "@/redux/slices/auth";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -14,7 +15,7 @@ function AuthGuard() {
     }
   }, [user?.role?.name, location.pathname, navigate]);
 
-  return <div></div>;
+  return <MainLayout />;
 }
 
 export default AuthGuard;
