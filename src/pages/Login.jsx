@@ -64,10 +64,10 @@ export default function Login() {
             }}
           >
             <Typography component="h1" variant="" className="heading">
-              Đăng Nhập
+              Sign in
             </Typography>
             <Typography component="h1" variant="" className="subheading">
-              Nhập thông tin đăng nhập để tiếp tục
+              Fill your information below to continue
             </Typography>
             <Box
               component="form"
@@ -82,11 +82,11 @@ export default function Login() {
                 fullWidth
                 required
                 {...register("email", {
-                  required: "Không được để trống",
+                  required: "This is required",
                   pattern: {
                     value:
                       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                    message: "Email không hợp lệ",
+                    message: "Invalid email",
                   },
                 })}
                 id="email"
@@ -104,10 +104,10 @@ export default function Login() {
                 fullWidth
                 required
                 {...register("password", {
-                  required: "Không được để trống",
+                  required: "This is required",
                 })}
                 id="password"
-                label="Mật khẩu"
+                label="Password"
                 name="password"
                 type="password"
               />
@@ -123,7 +123,7 @@ export default function Login() {
                 sx={{ mt: 3, mb: 2 }}
               >
                 <Typography component="h1" variant="" className="submit-button">
-                  Đăng nhập
+                  Sign in
                 </Typography>
               </Button>
               <Grid container justifyContent="flex-end">
@@ -134,7 +134,7 @@ export default function Login() {
                     underline="hover"
                     className="text"
                   >
-                    {"Chưa có tài khoản? Đăng ký"}
+                    {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>
               </Grid>

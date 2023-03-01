@@ -61,10 +61,10 @@ export default function Register() {
             }}
           >
             <Typography component="h1" variant="" className="heading">
-              Đăng ký
+              Sign up
             </Typography>
             <Typography component="h1" variant="" className="subheading">
-              Nhập thông tin đăng ký để tiếp tục
+              Fill your information below to continue
             </Typography>
             <Box
               component="form"
@@ -80,10 +80,10 @@ export default function Register() {
                     fullWidth
                     required
                     {...register("firstName", {
-                      required: "Không được để trống",
+                      required: "This is required",
                     })}
                     id="firstName"
-                    label="Họ"
+                    label="First Name"
                     name="firstName"
                     autoFocus
                   />
@@ -98,10 +98,10 @@ export default function Register() {
                     fullWidth
                     required
                     {...register("lastName", {
-                      required: "Không được để trống",
+                      required: "This is required",
                     })}
                     id="lastName"
-                    label="Tên"
+                    label="Last Name"
                     name="lastName"
                   />
                   {errors.lastName && (
@@ -115,11 +115,11 @@ export default function Register() {
                     fullWidth
                     required
                     {...register("email", {
-                      required: "Không được để trống",
+                      required: "This is required",
                       pattern: {
                         value:
                           /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                        message: "Email không hợp lệ",
+                        message: "Invalid email",
                       },
                     })}
                     id="email"
@@ -138,14 +138,14 @@ export default function Register() {
                     fullWidth
                     required
                     {...register("password", {
-                      required: "Không được để trống",
+                      required: "This is required",
                       minLength: {
                         value: 4,
-                        message: "Mật khẩu tối thiểu 4 ký tự",
+                        message: "Password must contain at least 4 characters",
                       },
                     })}
                     id="password"
-                    label="Mật khẩu"
+                    label="Password"
                     name="password"
                     type="password"
                   />
@@ -163,13 +163,13 @@ export default function Register() {
                 sx={{ mt: 3, mb: 2 }}
               >
                 <Typography component="h1" variant="" className="submit-button">
-                  Đăng ký
+                  Sign up
                 </Typography>
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
                   <Link href="/" variant="body2" underline="hover">
-                    Đã có tài khoản? Đăng nhập
+                    Already have an account? Sign In
                   </Link>
                 </Grid>
               </Grid>
