@@ -1,9 +1,15 @@
+const GREY = {
+  0: "#FFFFFF",
+  100: "#F9FAFB",
+  200: "#F4F6F8",
+};
+
 const PRIMARY = {
-  main: "#212121",
+  main: "#fafafa",
 };
 
 const SECONDARY = {
-  main: "#fafafa",
+  main: "#212121",
 };
 
 const INFO = {
@@ -37,7 +43,7 @@ const palette = {
   success: { ...SUCCESS },
   warning: { ...WARNING },
   error: { ...ERROR },
-  // background: { paper: '#fff', default: GREY[100], neutral: GREY[200] },
+  background: { paper: "#fafafa", default: GREY[100], neutral: GREY[200] },
   action: {
     hoverOpacity: 0.08,
     disabledOpacity: 0.48,
