@@ -2,7 +2,7 @@ import React from "react";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
+import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -72,12 +72,10 @@ export default function SignUp() {
               flexDirection: "column",
             }}
           >
-            <Typography component="h1" variant="" className="heading">
+            <Typography variant="h3" className="heading">
               Sign up
             </Typography>
-            <Typography component="h1" variant="" className="subheading">
-              Fill your information below to continue
-            </Typography>
+            <Typography className="subheading">Fill your information below to continue</Typography>
             <Box component="form" noValidate onSubmit={sendData} sx={{ mt: 3 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
@@ -158,12 +156,8 @@ export default function SignUp() {
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <span style={{ fontSize: "0.875rem", opacity: "0.7" }}>
-                    {"Already have an account? "}
-                  </span>
-                  <Link href="/login" variant="body2" underline="hover">
-                    {"Log In"}
-                  </Link>
+                  <span style={{ fontSize: "0.875rem", opacity: "0.7" }}>{"Already have an account? "}</span>
+                  <Link to="/login">{"Log In"}</Link>
                 </Grid>
               </Grid>
             </Box>

@@ -78,12 +78,8 @@ export default function Login() {
               flexDirection: "column",
             }}
           >
-            <Typography component="h1" variant="" className="heading">
-              Log in
-            </Typography>
-            <Typography component="h1" variant="" className="subheading">
-              Fill your information below to continue
-            </Typography>
+            <Typography variant="h3">Log In</Typography>
+            <Typography>Fill your information below to continue</Typography>
             <Box component="form" onSubmit={sendData} noValidate sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
@@ -118,19 +114,13 @@ export default function Login() {
               {errors.password && (
                 <span style={{ fontSize: "14px", color: "#bf1650" }}>{errors.password?.message}</span>
               )}
-              <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
-                <Typography component="h1" variant="" className="submit-button">
-                  Log in
-                </Typography>
+              <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2, padding: 1, fontSize: "1.2rem" }}>
+                Log in
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <span style={{ fontSize: "0.875rem", opacity: "0.7" }}>
-                    {"Don't have an account? "}
-                  </span>
-                  <Link href="/signup" variant="body2" underline="hover">
-                    {"Sign Up"}
-                  </Link>
+                  <span style={{ fontSize: "0.875rem", opacity: "0.7" }}>{"Don't have an account? "}</span>
+                  <Link to="/signup">{"Sign Up"}</Link>
                 </Grid>
               </Grid>
             </Box>

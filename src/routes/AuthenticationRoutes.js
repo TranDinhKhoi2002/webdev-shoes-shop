@@ -1,6 +1,6 @@
 import AuthLayout from "@/layout/AuthLayout";
 import Login from "@/pages/Login";
-import Register from "@/pages/Register";
+import Signup from "@/pages/SignUp";
 
 const AuthenticationRoutes = {
   path: "/",
@@ -12,7 +12,7 @@ const AuthenticationRoutes = {
     },
     {
       path: "/signup",
-      element: <Register />,
+      element: <Signup />,
     },
   ],
 };
