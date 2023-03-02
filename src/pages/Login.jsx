@@ -10,10 +10,12 @@ import Paper from "@mui/material/Paper";
 import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../App.css";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -32,7 +34,7 @@ export default function Login() {
       .then((response) => {
         console.log(response.data);
         if (response.status === 200) {
-          Navigate("/home");
+          navigate("/home");
         }
       })
       .catch((error) => {
