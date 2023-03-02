@@ -40,6 +40,9 @@ function Home() {
                   marginY: 1,
                   backgroundColor: category === currentCategory && theme.palette.secondary.main,
                   color: category === currentCategory && theme.palette.primary.main,
+                  ":hover": {
+                    color: "white",
+                  },
                 }}
                 onClick={handleChangeCategory.bind(this, category)}
               >
@@ -50,11 +53,7 @@ function Home() {
           <ButtonMenu />
         </Stack>
 
-        <TextField
-          placeholder="Search your products by name"
-          variant="outlined"
-          sx={{ marginY: 3, width: { xs: "100%", md: "380px" } }}
-        />
+        <TextField placeholder="Search your products by name" sx={{ marginY: 3, width: { xs: "100%", md: "380px" } }} />
 
         <Grid container spacing={2}>
           <Grid item xs={6} md={4} lg={3}>

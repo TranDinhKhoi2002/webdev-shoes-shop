@@ -14,14 +14,14 @@ function ProductItem(item) {
       <Typography sx={{ mt: "5px" }}>399,000đ</Typography>
       <Button
         sx={{
-          color: "#212121",
+          // color: "#212121",
           border: "1px solid #212121",
           borderRadius: 4,
           mt: 2,
           paddingX: 2,
           "&:hover": {
-            backgroundColor: "#212121",
-            color: "#fafafa",
+            // backgroundColor: "#212121",
+            // color: "#fafafa",
           },
         }}
       >

@@ -2,20 +2,18 @@ import React from "react";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
+import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
-import "../App.css";
 
 export default function Login() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -42,8 +40,7 @@ export default function Login() {
         sm={4}
         md={4}
         sx={{
-          backgroundImage:
-            "url(https://i.pinimg.com/originals/5e/e6/ff/5ee6ff55c6386e5cc07697c5b33d2c02.jpg)",
+          backgroundImage: "url(https://i.pinimg.com/originals/5e/e6/ff/5ee6ff55c6386e5cc07697c5b33d2c02.jpg)",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -94,11 +91,7 @@ export default function Login() {
                 name="email"
                 autoFocus
               />
-              {errors.email && (
-                <span style={{ fontSize: "14px", color: "#bf1650" }}>
-                  {errors.email?.message}
-                </span>
-              )}
+              {errors.email && <span style={{ fontSize: "14px", color: "#bf1650" }}>{errors.email?.message}</span>}
               <TextField
                 margin="normal"
                 fullWidth
@@ -112,30 +105,16 @@ export default function Login() {
                 type="password"
               />
               {errors.password && (
-                <span style={{ fontSize: "14px", color: "#bf1650" }}>
-                  {errors.password?.message}
-                </span>
+                <span style={{ fontSize: "14px", color: "#bf1650" }}>{errors.password?.message}</span>
               )}
-              <Button
-                fullWidth
-                type="submit"
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
+              <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
                 <Typography component="h1" variant="" className="submit-button">
                   Đăng nhập
                 </Typography>
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link
-                    href="/register"
-                    variant="body2"
-                    underline="hover"
-                    className="text"
-                  >
-                    {"Chưa có tài khoản? Đăng ký"}
-                  </Link>
+                  <Link to="/signup">{"Chưa có tài khoản? Đăng ký"}</Link>
                 </Grid>
               </Grid>
             </Box>

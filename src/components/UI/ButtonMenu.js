@@ -3,12 +3,10 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { useTheme } from "@mui/styles";
 
 export default function ButtonMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const theme = useTheme();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -25,9 +23,8 @@ export default function ButtonMenu() {
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
+        variant="outlined"
         sx={{
-          color: `${theme.palette.secondary.main}`,
-          border: `1px solid ${theme.palette.secondary.main}`,
           borderRadius: 4,
           paddingX: 2,
           marginTop: {

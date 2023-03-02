@@ -22,13 +22,13 @@ const GREY = {
 };
 
 const PRIMARY = {
-  main: "#e7e7e7",
-  dark: "#c4bbbb",
+  main: "#212121",
+  dark: "#000000",
 };
 
 const SECONDARY = {
-  main: "#212121",
-  dark: "#000000",
+  main: "#e6dfdf",
+  dark: "#c4bbbb",
 };
 
 const INFO = {

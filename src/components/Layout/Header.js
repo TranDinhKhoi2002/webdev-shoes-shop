@@ -193,7 +193,7 @@ const Header = () => {
               <Link to="/">
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <img src={logo} alt="" width={50} height={50} />
-                  <Typography sx={{ fontSize: "1.8rem", color: "#212121" }}>Little Shop</Typography>
+                  <Typography sx={{ fontSize: "1.8rem", color: "white" }}>Little Shop</Typography>
                 </Stack>
               </Link>
               {matches ? drawer : tabs}
