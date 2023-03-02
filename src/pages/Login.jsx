@@ -9,8 +9,12 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -20,6 +24,20 @@ export default function Login() {
       email: "",
       password: "",
     },
+  });
+
+  const sendData = handleSubmit((data) => {
+    axios
+      .post("/login", data)
+      .then((response) => {
+        console.log(response.data);
+        if (response.status === 200) {
+          navigate("/home");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   });
 
   return (
@@ -61,29 +79,22 @@ export default function Login() {
             }}
           >
             <Typography component="h1" variant="" className="heading">
-              Đăng Nhập
+              Log in
             </Typography>
             <Typography component="h1" variant="" className="subheading">
-              Nhập thông tin đăng nhập để tiếp tục
+              Fill your information below to continue
             </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit((data) => {
-                console.log(data);
-              })}
-              noValidate
-              sx={{ mt: 1 }}
-            >
+            <Box component="form" onSubmit={sendData} noValidate sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 fullWidth
                 required
                 {...register("email", {
-                  required: "Không được để trống",
+                  required: "This is required",
                   pattern: {
                     value:
                       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                    message: "Email không hợp lệ",
+                    message: "Invalid email",
                   },
                 })}
                 id="email"
@@ -97,10 +108,10 @@ export default function Login() {
                 fullWidth
                 required
                 {...register("password", {
-                  required: "Không được để trống",
+                  required: "This is required",
                 })}
                 id="password"
-                label="Mật khẩu"
+                label="Password"
                 name="password"
                 type="password"
               />
@@ -109,12 +120,17 @@ export default function Login() {
               )}
               <Button fullWidth type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
                 <Typography component="h1" variant="" className="submit-button">
-                  Đăng nhập
+                  Log in
                 </Typography>
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link to="/signup">{"Chưa có tài khoản? Đăng ký"}</Link>
+                  <span style={{ fontSize: "0.875rem", opacity: "0.7" }}>
+                    {"Don't have an account? "}
+                  </span>
+                  <Link href="/signup" variant="body2" underline="hover">
+                    {"Sign Up"}
+                  </Link>
                 </Grid>
               </Grid>
             </Box>

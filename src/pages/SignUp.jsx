@@ -9,8 +9,12 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-export default function Register() {
+export default function SignUp() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -22,6 +26,20 @@ export default function Register() {
       email: "",
       password: "",
     },
+  });
+
+  const sendData = handleSubmit((data) => {
+    axios
+      .post("/signup", data)
+      .then((response) => {
+        console.log(response.data);
+        if (response.status === 200) {
+          navigate("/login");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   });
 
   return (
@@ -55,29 +73,22 @@ export default function Register() {
             }}
           >
             <Typography component="h1" variant="" className="heading">
-              Đăng ký
+              Sign up
             </Typography>
             <Typography component="h1" variant="" className="subheading">
-              Nhập thông tin đăng ký để tiếp tục
+              Fill your information below to continue
             </Typography>
-            <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit((data) => {
-                console.log(data);
-              })}
-              sx={{ mt: 3 }}
-            >
+            <Box component="form" noValidate onSubmit={sendData} sx={{ mt: 3 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     required
                     {...register("firstName", {
-                      required: "Không được để trống",
+                      required: "This is required",
                     })}
                     id="firstName"
-                    label="Họ"
+                    label="First Name"
                     name="firstName"
                     autoFocus
                   />
@@ -90,10 +101,10 @@ export default function Register() {
                     fullWidth
                     required
                     {...register("lastName", {
-                      required: "Không được để trống",
+                      required: "This is required",
                     })}
                     id="lastName"
-                    label="Tên"
+                    label="Last Name"
                     name="lastName"
                   />
                   {errors.lastName && (
@@ -105,11 +116,11 @@ export default function Register() {
                     fullWidth
                     required
                     {...register("email", {
-                      required: "Không được để trống",
+                      required: "This is required",
                       pattern: {
                         value:
                           /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                        message: "Email không hợp lệ",
+                        message: "Invalid email",
                       },
                     })}
                     id="email"
@@ -124,14 +135,14 @@ export default function Register() {
                     fullWidth
                     required
                     {...register("password", {
-                      required: "Không được để trống",
+                      required: "This is required",
                       minLength: {
                         value: 4,
-                        message: "Mật khẩu tối thiểu 4 ký tự",
+                        message: "Password must contain at least 4 characters",
                       },
                     })}
                     id="password"
-                    label="Mật khẩu"
+                    label="Password"
                     name="password"
                     type="password"
                   />
@@ -142,13 +153,16 @@ export default function Register() {
               </Grid>
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                 <Typography component="h1" variant="" className="submit-button">
-                  Đăng ký
+                  Sign up
                 </Typography>
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link href="/" variant="body2" underline="hover">
-                    Đã có tài khoản? Đăng nhập
+                  <span style={{ fontSize: "0.875rem", opacity: "0.7" }}>
+                    {"Already have an account? "}
+                  </span>
+                  <Link href="/login" variant="body2" underline="hover">
+                    {"Log In"}
                   </Link>
                 </Grid>
               </Grid>
