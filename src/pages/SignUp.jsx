@@ -9,8 +9,10 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { Navigate } from "react-router-dom";
 
-export default function Register() {
+export default function SignUp() {
   const {
     register,
     handleSubmit,
@@ -23,6 +25,20 @@ export default function Register() {
       email: "",
       password: "",
     },
+  });
+
+  const sendData = handleSubmit((data) => {
+    axios
+      .post("/signup", data)
+      .then((response) => {
+        console.log(response.data);
+        if (response.status === 200) {
+          Navigate("/login");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   });
 
   return (
@@ -66,14 +82,7 @@ export default function Register() {
             <Typography component="h1" variant="" className="subheading">
               Fill your information below to continue
             </Typography>
-            <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit((data) => {
-                console.log(data);
-              })}
-              sx={{ mt: 3 }}
-            >
+            <Box component="form" noValidate onSubmit={sendData} sx={{ mt: 3 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -168,8 +177,11 @@ export default function Register() {
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link href="/" variant="body2" underline="hover">
-                    Already have an account? Sign In
+                  <span style={{ fontSize: "0.875rem", opacity: "0.7" }}>
+                    {"Already have an account? "}
+                  </span>
+                  <Link href="/login" variant="body2" underline="hover">
+                    {"Log In"}
                   </Link>
                 </Grid>
               </Grid>

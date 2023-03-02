@@ -9,6 +9,8 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { Navigate } from "react-router-dom";
 import "../App.css";
 
 export default function Login() {
@@ -22,6 +24,20 @@ export default function Login() {
       email: "",
       password: "",
     },
+  });
+
+  const sendData = handleSubmit((data) => {
+    axios
+      .post("/login", data)
+      .then((response) => {
+        console.log(response.data);
+        if (response.status === 200) {
+          Navigate("/home");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   });
 
   return (
@@ -64,19 +80,12 @@ export default function Login() {
             }}
           >
             <Typography component="h1" variant="" className="heading">
-              Sign in
+              Log in
             </Typography>
             <Typography component="h1" variant="" className="subheading">
               Fill your information below to continue
             </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit((data) => {
-                console.log(data);
-              })}
-              noValidate
-              sx={{ mt: 1 }}
-            >
+            <Box component="form" onSubmit={sendData} noValidate sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 fullWidth
@@ -123,18 +132,16 @@ export default function Login() {
                 sx={{ mt: 3, mb: 2 }}
               >
                 <Typography component="h1" variant="" className="submit-button">
-                  Sign in
+                  Log in
                 </Typography>
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link
-                    href="/register"
-                    variant="body2"
-                    underline="hover"
-                    className="text"
-                  >
-                    {"Don't have an account? Sign Up"}
+                  <span style={{ fontSize: "0.875rem", opacity: "0.7" }}>
+                    {"Don't have an account? "}
+                  </span>
+                  <Link href="/signup" variant="body2" underline="hover">
+                    {"Sign Up"}
                   </Link>
                 </Grid>
               </Grid>
