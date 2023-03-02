@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 
 import {
@@ -10,21 +10,26 @@ import {
   ListItemText,
   IconButton,
   Toolbar,
-  Grid,
   AppBar,
   ListItemButton,
+  Stack,
+  Tooltip,
 } from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import { makeStyles } from "@mui/styles";
+import logo from "@/assets/images/sneakers.png";
 
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 
 import MenuIcon from "@mui/icons-material/Menu";
 import { useLocation } from "react-router-dom";
+import PopperButton from "../UI/PopperButton";
 
 const routes = [
   { name: "Home", link: "/" },
-  { name: "About", link: "/about" },
-  // { name: "path name", link: "link url" }, like this
+  { name: "History", link: "/history" },
 ];
 
 function ElevationScroll(props) {
@@ -89,6 +94,7 @@ const Header = () => {
   const classes = useStyles();
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -97,26 +103,23 @@ const Header = () => {
   const path = routes;
 
   const tabs = (
-    <>
-      <Grid container spacing={4} sx={{ justifyContent: "flex-end" }}>
-        {path.map(({ name, link }) => (
-          <Grid item key={link}>
-            <Link to={link}>
-              <Typography
-                className={classes.link}
-                sx={{
-                  fontWeight: location.pathname === link && "bold",
-                  borderBottom: location.pathname === link && "1px solid #757ce8",
-                }}
-              >
-                {name}
-              </Typography>
-            </Link>
-          </Grid>
-        ))}
-      </Grid>
-    </>
+    <Stack direction="row" spacing={8}>
+      {path.map(({ name, link }) => (
+        <Link to={link} key={link}>
+          <Typography
+            className={classes.link}
+            sx={{
+              fontWeight: location.pathname === link && "bold",
+              borderBottom: location.pathname === link && "1px solid #757ce8",
+            }}
+          >
+            {name}
+          </Typography>
+        </Link>
+      ))}
+    </Stack>
   );
+
   const drawer = (
     <>
       <SwipeableDrawer
@@ -157,6 +160,22 @@ const Header = () => {
       </IconButton>
     </>
   );
+
+  const popperButtonItems = [
+    {
+      title: "Đăng nhập",
+      onClick: () => {
+        navigate("/login");
+      },
+    },
+    {
+      title: "Đăng ký",
+      onClick: () => {
+        navigate("/signup");
+      },
+    },
+  ];
+
   return (
     <>
       <ElevationScroll>
@@ -167,13 +186,35 @@ const Header = () => {
               maxWidth: "1280px",
               margin: "0 auto",
               width: "100%",
-              padding: matches ? "0 16px" : "24px",
+              padding: matches ? "0 16px" : "18px",
             }}
           >
-            <Link to="/">
-              <Typography className={classes.logo}>Little Shop</Typography>
-            </Link>
-            {matches ? drawer : tabs}
+            <Stack direction="row" spacing={10} alignItems="center" justifyContent={"space-between"} width="100%">
+              <Link to="/">
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img src={logo} alt="" width={50} height={50} />
+                  <Typography sx={{ fontSize: "1.8rem", color: "#212121" }}>Little Shop</Typography>
+                </Stack>
+              </Link>
+              {matches ? drawer : tabs}
+              {!matches && (
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <PopperButton icon={<PersonIcon />} items={popperButtonItems} />
+                  <Tooltip title="History">
+                    <IconButton>
+                      <ShoppingBagIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Link to="/cart">
+                    <Tooltip title="Cart">
+                      <IconButton>
+                        <ShoppingCartIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Link>
+                </Stack>
+              )}
+            </Stack>
           </Toolbar>
         </AppBar>
       </ElevationScroll>

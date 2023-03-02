@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 
@@ -25,16 +24,10 @@ function CartTableToolbar({ numSelected, onDelete }) {
         </Typography>
       )}
 
-      {numSelected > 0 ? (
+      {numSelected > 0 && (
         <Tooltip title="Delete">
           <IconButton onClick={onDelete}>
             <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
           </IconButton>
         </Tooltip>
       )}

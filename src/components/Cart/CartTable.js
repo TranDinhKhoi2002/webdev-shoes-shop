@@ -143,6 +143,10 @@ export default function CartTable() {
     return toast.success("Ordered successfully!!");
   };
 
+  const handleContinueShopping = () => {
+    navigate("/");
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       {rows.length > 0 && (
@@ -231,6 +235,7 @@ export default function CartTable() {
             <Button
               variant="contained"
               sx={{ paddingX: 8, paddingY: 2, fontSize: "1rem", borderRadius: 4, textTransform: "uppercase" }}
+              onClick={handleContinueShopping}
             >
               Shop Now
             </Button>

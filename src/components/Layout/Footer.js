@@ -9,7 +9,7 @@ import SocialIcons from "@/components/Layout/SocialIcons";
 
 const routes = [
   { name: "Home", link: "/" },
-  { name: "About", link: "/about" },
+  { name: "History", link: "/history" },
 ];
 
 const useStyles = makeStyles((theme) => ({
