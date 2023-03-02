@@ -10,7 +10,7 @@ function AuthGuard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.role?.name !== "Admin" && location.pathname === "/admin/add-product") {
+    if (user?.role?.name !== "Admin" && location.pathname === "/admin/add-product" ) {
       navigate(-1);
     }
   }, [user?.role?.name, location.pathname, navigate]);

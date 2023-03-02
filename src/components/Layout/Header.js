@@ -24,6 +24,8 @@ import { useLocation } from "react-router-dom";
 const routes = [
   { name: "Home", link: "/" },
   { name: "About", link: "/about" },
+  { name: "Bought", link: "/bought" },
+  { name: "Product", link: "/product" },
   // { name: "path name", link: "link url" }, like this
 ];
 
