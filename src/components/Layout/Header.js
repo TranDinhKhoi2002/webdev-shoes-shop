@@ -30,6 +30,8 @@ import PopperButton from "../UI/PopperButton";
 const routes = [
   { name: "Home", link: "/" },
   { name: "History", link: "/history" },
+  { name: "Bought", link: "/bought" },
+  { name: "Product", link: "/product" },
 ];
 
 function ElevationScroll(props) {
