@@ -51,7 +51,7 @@ function Home() {
         </Stack>
 
         <TextField
-          placeholder="Search your product by name"
+          placeholder="Search your products by name"
           variant="outlined"
           sx={{ marginY: 3, width: { xs: "100%", md: "380px" } }}
         />
