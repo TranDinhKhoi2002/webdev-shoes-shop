@@ -10,7 +10,7 @@ import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import FormProvider from "@/components/Form/FormProvider";
-import { signup } from "@/services/authRequests";
+import { signup } from "@/services/authServices";
 import { toast } from "react-toastify";
 
 export default function SignUp() {

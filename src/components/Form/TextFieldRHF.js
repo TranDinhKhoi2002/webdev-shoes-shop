@@ -8,7 +8,7 @@ TextFieldRHF.propTypes = {
   name: PropTypes.string,
 };
 
-export default function TextFieldRHF({ name, label, ...other }) {
+export default function TextFieldRHF({ name, ...other }) {
   const { control } = useFormContext();
 
   return (
@@ -19,7 +19,6 @@ export default function TextFieldRHF({ name, label, ...other }) {
         <TextField
           {...field}
           fullWidth
-          label={label}
           value={field.value || other.text || ""}
           error={!!error}
           helperText={error?.message}
