@@ -25,8 +25,16 @@ export default function Admin() {
       .required("This is required")
       .matches(/[0-9]+/gi, "Price must be a number"),
     discount: Yup.number()
-      .required("This is required")
       .typeError("Discount must be a number")
+      .required("This is required")
+      .nullable(true)
+      .transform((value) => {
+        if (value === null || isNaN(value)) {
+          return undefined;
+        } // transform null/NaN to undefined
+        return value; // return original value
+      })
+
       .min(0, "Discount must be between 0 and 1")
       .max(1, "Discount must be between 0 and 1"),
     desc: Yup.string().required("This is required"),
@@ -90,19 +98,7 @@ export default function Admin() {
                 <TextFieldRHF label="Size *" name="size" />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Button
-                  component="label"
-                  variant="outlined"
-                  startIcon={<UploadFileIcon />}
-                  sx={{
-                    //   marginRight: "1rem",
-                    minWidth: "544px",
-                    minHeight: "56px",
-                  }}
-                >
-                  Image
-                  <input type="file" accept=".png" hidden />
-                </Button>
+                <TextFieldRHF label="Description *" name="desc" />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextFieldRHF label="Price *" name="price" />
@@ -111,7 +107,19 @@ export default function Admin() {
                 <TextFieldRHF label="Discount *" name="discount" />
               </Grid>
               <Grid item xs={12}>
-                <TextFieldRHF label="Description *" name="desc" />
+                <Button
+                  component="label"
+                  variant="outlined"
+                  startIcon={<UploadFileIcon />}
+                  sx={{
+                    marginRight: "1rem",
+                    width: "inherit",
+                    minHeight: "56px",
+                  }}
+                >
+                  Image
+                  <input type="file" accept=".png" hidden />
+                </Button>
               </Grid>
             </Grid>
             <LoadingButton
