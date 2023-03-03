@@ -20,28 +20,53 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     width: "70%",
     margin: "auto",
+    [theme.breakpoints.down("sm")]: {
+      width: "90%",
+    },
   },
   media: {
     height: 450,
+    [theme.breakpoints.down("sm")]: {
+      height: 300,
+    },
   },
   imageGrid: {
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
+    [theme.breakpoints.down("sm")]: {
+      paddingTop: theme.spacing(1),
+      paddingBottom: theme.spacing(1),
+    },
   },
   imageGrid2: {
     paddingBottom: theme.spacing(2),
+    [theme.breakpoints.down("sm")]: {
+      paddingBottom: theme.spacing(1),
+    },
   },
   smallImage: {
     height: 80,
     width: 80,
+    [theme.breakpoints.down("sm")]: {
+      height: 60,
+      width: 60,
+    },
   },
   description: {
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
+    [theme.breakpoints.down("sm")]: {
+      paddingTop: theme.spacing(1),
+      paddingBottom: theme.spacing(1),
+    },
   },
   button: {
     marginTop: theme.spacing(3),
     padding: "12px 30px",
+    [theme.breakpoints.down("sm")]: {
+      marginTop: theme.spacing(2),
+      padding: "8px 20px",
+    },
   },
   cardContent: {
     paddingBottom: theme.spacing(0),
@@ -54,6 +79,10 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       border: `1px solid ${theme.palette.primary.main}`,
     },
+    [theme.breakpoints.down("sm")]: {
+      width: "40px",
+      height: "40px",
+    },
   },
   selectedImage: {
     border: "3px solid white",
@@ -62,6 +91,10 @@ const useStyles = makeStyles((theme) => ({
   input: {
     width: "4em",
     marginRight: "0.5em",
+    [theme.breakpoints.down("sm")]: {
+      width: "3em",
+      marginRight: "0.25em",
+    },
   },
 }));
 
