@@ -9,36 +9,28 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import FormProvider from "@/components/Form/FormProvider";
 
 export default function Login() {
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const methods = useForm({
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const sendData = handleSubmit((data) => {
-    axios
-      .post("/login", data)
-      .then((response) => {
-        console.log(response.data);
-        if (response.status === 200) {
-          navigate("/home");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
+
+  const onSubmit = (values) => {
+    console.log(values);
+  };
 
   return (
     <Grid
@@ -80,7 +72,7 @@ export default function Login() {
           >
             <Typography variant="h3">Log In</Typography>
             <Typography>Fill your information below to continue</Typography>
-            <Box component="form" onSubmit={sendData} noValidate sx={{ mt: 1 }}>
+            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
               <TextField
                 margin="normal"
                 fullWidth
@@ -123,7 +115,7 @@ export default function Login() {
                   <Link to="/signup">{"Sign Up"}</Link>
                 </Grid>
               </Grid>
-            </Box>
+            </FormProvider>
           </Box>
         </Container>
       </Grid>

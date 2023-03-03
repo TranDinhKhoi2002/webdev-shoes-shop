@@ -164,13 +164,13 @@ const Header = () => {
 
   const popperButtonItems = [
     {
-      title: "Đăng nhập",
+      title: "Log In",
       onClick: () => {
         navigate("/login");
       },
     },
     {
-      title: "Đăng ký",
+      title: "Sign Up",
       onClick: () => {
         navigate("/signup");
       },

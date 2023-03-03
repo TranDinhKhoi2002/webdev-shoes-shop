@@ -1,6 +1,5 @@
 import React from "react";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
@@ -9,42 +8,56 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import FormProvider from "@/components/Form/FormProvider";
+import { signup } from "@/services/authRequests";
+import { toast } from "react-toastify";
 
 export default function SignUp() {
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const methods = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      fullName: "",
       email: "",
       password: "",
+      confirmPassword: "",
+      phone: "",
+      address: "",
     },
   });
 
-  const sendData = handleSubmit((data) => {
-    axios
-      .post("/signup", data)
-      .then((response) => {
-        console.log(response.data);
-        if (response.status === 200) {
-          navigate("/login");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  });
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = methods;
+
+  const onSubmit = async (values) => {
+    console.log(values);
+    const account = {
+      name: values.fullName,
+      email: values.email,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+      phone: values.phone,
+      address: values.address,
+    };
+
+    try {
+      const res = await signup(account);
+      if (res.status === 201) {
+        toast.success("Signed up successfully!!");
+        navigate("/", { replace: true });
+      }
+    } catch (error) {
+      toast.error("Something went wrong!! Please try again");
+    }
+  };
 
   return (
     <Grid container component="main" sx={{ height: "100%", padding: "35px 0 0 20px" }}>
-      <CssBaseline />
       <Grid
         item
         component={Paper}
@@ -75,39 +88,24 @@ export default function SignUp() {
             <Typography variant="h3" className="heading">
               Sign up
             </Typography>
-            <Typography className="subheading">Fill your information below to continue</Typography>
-            <Box component="form" noValidate onSubmit={sendData} sx={{ mt: 3 }}>
+            <Typography className="subheading" sx={{ mb: 3 }}>
+              Fill your information below to continue
+            </Typography>
+            <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={12}>
                   <TextField
                     fullWidth
                     required
-                    {...register("firstName", {
+                    {...register("fullName", {
                       required: "This is required",
                     })}
-                    id="firstName"
-                    label="First Name"
-                    name="firstName"
-                    autoFocus
+                    id="fullName"
+                    label="Full Name"
+                    name="fullName"
+                    error={!!errors.fullName}
+                    helperText={errors.fullName?.message}
                   />
-                  {errors.firstName && (
-                    <span style={{ fontSize: "14px", color: "#bf1650" }}>{errors.firstName?.message}</span>
-                  )}
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    required
-                    {...register("lastName", {
-                      required: "This is required",
-                    })}
-                    id="lastName"
-                    label="Last Name"
-                    name="lastName"
-                  />
-                  {errors.lastName && (
-                    <span style={{ fontSize: "14px", color: "#bf1650" }}>{errors.lastName?.message}</span>
-                  )}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -125,8 +123,9 @@ export default function SignUp() {
                     label="Email"
                     name="email"
                     type="email"
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
                   />
-                  {errors.email && <span style={{ fontSize: "14px", color: "#bf1650" }}>{errors.email?.message}</span>}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -135,18 +134,66 @@ export default function SignUp() {
                     {...register("password", {
                       required: "This is required",
                       minLength: {
-                        value: 4,
-                        message: "Password must contain at least 4 characters",
+                        value: 6,
+                        message: "Password must contain at least 6 characters",
                       },
                     })}
                     id="password"
                     label="Password"
                     name="password"
                     type="password"
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
                   />
-                  {errors.password && (
-                    <span style={{ fontSize: "14px", color: "#bf1650" }}>{errors.password?.message}</span>
-                  )}
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    required
+                    {...register("confirmPassword", {
+                      required: "This is required",
+                      validate: (value) => value === getValues("password"),
+                    })}
+                    id="confirmPassword"
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    type="password"
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword?.message}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    required
+                    {...register("phone", {
+                      required: "This is required",
+                      pattern: {
+                        value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                      },
+                    })}
+                    id="phone"
+                    label="Phone Number"
+                    name="phone"
+                    type="tel"
+                    error={!!errors.phone}
+                    helperText={errors.phone?.message}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    required
+                    {...register("address", {
+                      required: "This is required",
+                    })}
+                    id="address"
+                    label="Address"
+                    name="address"
+                    type="tel"
+                    error={!!errors.address}
+                    helperText={errors.address?.message}
+                  />
                 </Grid>
               </Grid>
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
@@ -160,7 +207,7 @@ export default function SignUp() {
                   <Link to="/login">{"Log In"}</Link>
                 </Grid>
               </Grid>
-            </Box>
+            </FormProvider>
           </Box>
         </Container>
       </Grid>
