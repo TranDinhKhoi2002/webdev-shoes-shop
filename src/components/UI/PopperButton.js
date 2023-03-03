@@ -19,7 +19,7 @@ function PopperButton({ icon, items }) {
               <List>
                 {items.map((item) => (
                   <ListItem
-                    key={item}
+                    key={item.title}
                     onClick={item.onClick}
                     sx={{ cursor: "pointer", "&:hover": { backgroundColor: "#e6e6e6" } }}
                   >
