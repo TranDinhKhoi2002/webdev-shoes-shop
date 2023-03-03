@@ -93,7 +93,9 @@ function Home() {
         {products.length === 0 && (
           <Typography sx={{ textAlign: "center", marginY: 10, fontSize: 30 }}>
             No products found in{" "}
-            <Typography sx={{ display: "inline-block", fontSize: 30, fontWeight: "bold" }}>{currentBrand}</Typography>{" "}
+            <Typography component="span" sx={{ display: "inline-block", fontSize: 30, fontWeight: "bold" }}>
+              {currentBrand}
+            </Typography>{" "}
             brand
           </Typography>
         )}

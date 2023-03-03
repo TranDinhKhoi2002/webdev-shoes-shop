@@ -12,6 +12,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import TextFieldRHF from "@/components/Form/TextFieldRHF";
 import { LoadingButton } from "@mui/lab";
 import { Stack } from "@mui/material";
+import { login } from "@/services/authServices";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -36,8 +39,24 @@ export default function Login() {
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = (values) => {
-    console.log(values);
+  const onSubmit = async (values) => {
+    const { email, password } = values;
+
+    try {
+      const { data, status } = await login({ email, password });
+      if (status === 200) {
+        const token = data.jwt;
+        const remainingMilliseconds = 24 * 60 * 60 * 1000;
+        const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
+
+        Cookies.set("token", token, { expires: expiryDate });
+        toast.success("Loged in successfully!!");
+
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error("Something went wrong!! Please try again");
+    }
   };
 
   return (
