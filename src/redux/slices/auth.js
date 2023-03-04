@@ -7,7 +7,10 @@ const initialState = {
   isAuthenticated: false,
 };
 
-export const fetchCurrentUser = createAsyncThunk("auth/fetchCurrentUser", async () => {});
+export const fetchCurrentUser = createAsyncThunk("auth/fetchCurrentUser", async () => {
+  const response = await authServices.getUserProfile();
+  return response;
+});
 
 export const fetchUserSignup = createAsyncThunk("auth/fetchUserSignup", async (formData) => {
   const response = await authServices.signup(formData);
@@ -24,33 +27,35 @@ const authSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchCurrentUser.fulfilled, (state, { payload }) => {});
+    builder.addCase(fetchCurrentUser.fulfilled, (state, { payload }) => {
+      const { success, user } = payload;
+
+      if (success) {
+        state.currentUser = user;
+        state.isAuthenticated = true;
+      }
+    });
     builder.addCase(fetchUserLogin.fulfilled, (state, { payload }) => {
-      const { success, token, user } = payload;
+      const { success, jwt, user } = payload;
 
       if (success) {
         const remainingMilliseconds = 24 * 60 * 60 * 1000;
         const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
-        Cookies.set("token", token, { expires: expiryDate });
+        Cookies.set("token", jwt, { expires: expiryDate });
 
         state.currentUser = user;
         state.isAuthenticated = true;
       }
     });
     builder.addCase(fetchUserSignup.fulfilled, (state, { payload }) => {
-      const { success, user } = payload;
+      const { success } = payload;
 
       if (success) {
-        Cookies.set("user", user);
-
-        state.isAuthenticated = true;
-        state.currentUser = user;
+        Cookies.remove("token");
       }
     });
   },
 });
-
-export const { login, logout } = authSlice.actions;
 
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectCurrentUser = (state) => state.auth.currentUser;
