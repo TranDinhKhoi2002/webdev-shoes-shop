@@ -4,15 +4,16 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
-export default function ButtonMenu() {
+export default function ButtonMenu({ onClick }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleClose = (order) => {
     setAnchorEl(null);
+    onClick(order);
   };
 
   return (
@@ -45,8 +46,8 @@ export default function ButtonMenu() {
           "aria-labelledby": "button-button",
         }}
       >
-        <MenuItem onClick={handleClose}>Price Asc</MenuItem>
-        <MenuItem onClick={handleClose}>Price Desc</MenuItem>
+        <MenuItem onClick={() => handleClose("asc")}>Price Asc</MenuItem>
+        <MenuItem onClick={() => handleClose("desc")}>Price Desc</MenuItem>
       </Menu>
     </div>
   );

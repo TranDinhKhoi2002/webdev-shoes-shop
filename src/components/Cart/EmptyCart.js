@@ -10,7 +10,7 @@ function EmptyCart() {
       <Link to="/">
         <Button
           variant="contained"
-          sx={{ paddingX: 10, paddingY: 2, fontSize: "1.5rem", mt: 3, textTransform: "uppercase" }}
+          sx={{ paddingX: 6, paddingY: 2, fontSize: "1.2rem", mt: 3, textTransform: "uppercase" }}
         >
           Shop Now
         </Button>

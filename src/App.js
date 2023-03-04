@@ -9,20 +9,21 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import Cookies from "js-cookie";
 import { fetchCurrentUser } from "./redux/slices/auth";
+import { getCommonData } from "./redux/slices/data";
 
 function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const getUser = async () => {
+    const getData = async () => {
       const token = Cookies.get("token");
       if (token) {
-        const response = await dispatch(fetchCurrentUser()).unwrap();
-        console.log(response);
+        await dispatch(fetchCurrentUser()).unwrap();
+        await dispatch(getCommonData()).unwrap();
       }
     };
 
-    getUser();
+    getData();
   }, [dispatch]);
 
   return (

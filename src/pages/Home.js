@@ -22,33 +22,37 @@ import { getProductsByBrand } from "@/services/productServices";
 import { toast } from "react-toastify";
 import useDebounce from "@/hooks/useDebounce";
 import { useSelector } from "react-redux";
-import { selectCurrentUser } from "@/redux/slices/auth";
+import { selectBrands, selectProducts } from "@/redux/slices/data";
 
 const images = [banner1, banner2, banner3];
-const brands = ["Converse", "Vans", "Nike", "Adidas", "Fila"];
+// const brands = ["Converse", "Vans", "Nike", "Adidas", "Fila"];
 
 function Home() {
-  const [currentBrand, setCurrentBrand] = useState(brands[0]);
-  const [products, setProducts] = useState([]);
+  const loadedProducts = useSelector(selectProducts);
+  const [products, setProducts] = useState(loadedProducts);
   const [searchValue, setSearchValue] = useState("");
   const theme = useTheme();
-  const currentUser = useSelector(selectCurrentUser);
-  console.log(currentUser);
+  const brands = useSelector(selectBrands);
+  const [currentBrand, setCurrentBrand] = useState(brands[0]?.name || "");
 
   const getProducts = async (brandName) => {
-    const products = await getProductsByBrand(brandName);
-    console.log(products);
-    setProducts(products);
+    if (brandName) {
+      const products = await getProductsByBrand(brandName);
+      setProducts(products);
+    }
   };
 
   useEffect(() => {
-    getProducts(brands[0]);
-  }, []);
+    getProducts(brands[0]?.name);
+    if (brands[0]) {
+      setCurrentBrand(brands[0].name);
+    }
+  }, [brands]);
 
   const handleChangeBrand = async (brandName) => {
     try {
-      getProducts(brandName);
       setCurrentBrand(brandName);
+      getProducts(brandName);
     } catch (error) {
       toast.error("Something went wrong!! Please try again");
     }
@@ -57,17 +61,35 @@ function Home() {
   const debouncedValue = useDebounce(searchValue, 500);
   useEffect(() => {
     if (debouncedValue.trim().length === 0) {
+      getProducts(currentBrand);
       return;
     }
 
-    const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(debouncedValue));
-    setProducts(filteredProducts);
-  }, [debouncedValue, products]);
+    if (debouncedValue !== "") {
+      const filteredProducts = products.filter((product) =>
+        product.name.toLowerCase().includes(debouncedValue.toLowerCase())
+      );
+      console.log(filteredProducts);
+      setProducts(filteredProducts);
+    }
+  }, [debouncedValue, currentBrand]);
 
   const handleInputChange = (e) => {
     const searchInputValue = e.target.value;
     if (!searchInputValue.startsWith(" ")) {
       setSearchValue(searchInputValue);
+    }
+  };
+
+  const handleSortProducts = (order) => {
+    const sortedProducts = [...products];
+
+    if (order === "asc") {
+      sortedProducts.sort((currentProduct, nextProduct) => currentProduct.price - nextProduct.price);
+      setProducts(sortedProducts);
+    } else {
+      sortedProducts.sort((currentProduct, nextProduct) => nextProduct.price - currentProduct.price);
+      setProducts(sortedProducts);
     }
   };
 
@@ -81,31 +103,29 @@ function Home() {
       <Container sx={{ marginY: 8 }} maxWidth="xl">
         <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between">
           <Box>
-            {brands.map((category) => (
+            {brands.map((brand) => (
               <Button
-                key={category}
+                key={brand._id}
                 variant="contained"
                 sx={{
                   textTransform: "uppercase",
                   marginRight: 3,
                   marginY: 1,
-                  backgroundColor: category === currentBrand && theme.palette.secondary.main,
-                  color: category === currentBrand && theme.palette.primary.main,
-                  ":hover": {
-                    color: "white",
-                  },
+                  backgroundColor: brand.name === currentBrand && theme.palette.secondary.main,
+                  color: brand.name === currentBrand && theme.palette.primary.main,
                 }}
-                onClick={handleChangeBrand.bind(this, category)}
+                onClick={handleChangeBrand.bind(this, brand.name)}
               >
-                {category}
+                {brand.name}
               </Button>
             ))}
           </Box>
-          <ButtonMenu />
+          <ButtonMenu onClick={handleSortProducts} />
         </Stack>
 
         <TextField
           placeholder="Search your products by name"
+          value={searchValue}
           sx={{ marginY: 3, width: { xs: "100%", md: "380px" } }}
           onChange={handleInputChange}
         />
