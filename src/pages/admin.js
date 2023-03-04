@@ -88,8 +88,7 @@ export default function Admin() {
         >
           <Typography
             component="h1"
-            variant="h4"
-            sx={{ mt: 3, mb: 2, fontWeight: "bold" }}
+            sx={{ mt: 3, mb: 2, fontWeight: "bold", fontSize: "2rem" }}
           >
             Create Product
           </Typography>
@@ -118,6 +117,7 @@ export default function Admin() {
                 <Button
                   component="label"
                   variant="outlined"
+                  name="image"
                   startIcon={<UploadFileIcon />}
                   sx={{
                     marginRight: "1rem",
@@ -126,7 +126,11 @@ export default function Admin() {
                   }}
                 >
                   Image
-                  <input type="file" accept=".png" hidden />
+                  <input
+                    type="file"
+                    accept="image/png, image/jpg, image/jpeg"
+                    hidden
+                  />
                 </Button>
               </Grid>
             </Grid>
