@@ -1,6 +1,6 @@
 import Cart from "@/pages/Cart";
 import Home from "@/pages/Home";
-import Product from "@/pages/Product";
+import Product from "@/pages/ProductInfor";
 import Bought from "@/pages/History";
 
 const CommonRoutes = [
@@ -13,7 +13,7 @@ const CommonRoutes = [
     element: <Cart />,
   },
   {
-    path: "/product",
+    path: "/products/:productId",
     element: <Product />,
   },
   {

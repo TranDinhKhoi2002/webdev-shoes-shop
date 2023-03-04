@@ -4,13 +4,12 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from '@mui/material/TableHead';
+import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { makeStyles } from "@mui/styles";
 import { Box, Typography } from "@mui/material";
-import TotalCostCard from "@/components/History/TotalCard/TotalCar";
-import { useState } from "react";
+import TotalCostCard from "@/components/History/TotalCostCard";
 
 const rows = [
   {
@@ -151,12 +150,24 @@ export default function HistoryTables() {
         <Table sx={{ minWidth: 500 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell align="right">Image</StyledTableCell>
-              <StyledTableCell align="left">Name</StyledTableCell>
-              <StyledTableCell align="left">Price</StyledTableCell>
-              <StyledTableCell align="center">Amount</StyledTableCell>
-              <StyledTableCell align="center">Total</StyledTableCell>
-              <StyledTableCell align="center">BoughtAt</StyledTableCell>
+              <StyledTableCell sx={{ textTransform: "uppercase" }} align="right">
+                Image
+              </StyledTableCell>
+              <StyledTableCell sx={{ textTransform: "uppercase" }} align="left">
+                Name
+              </StyledTableCell>
+              <StyledTableCell sx={{ textTransform: "uppercase" }} align="left">
+                Price
+              </StyledTableCell>
+              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+                Amount
+              </StyledTableCell>
+              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+                Total
+              </StyledTableCell>
+              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+                Bought At
+              </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -175,9 +186,7 @@ export default function HistoryTables() {
           </TableBody>
         </Table>
       </TableContainer>
-      <div>
-        <TotalCostCard totalCost={total} />
-      </div>
+      <TotalCostCard totalCost={total} />
     </Box>
   );
 }

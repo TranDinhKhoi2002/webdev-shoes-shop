@@ -1,12 +1,16 @@
 import { printPriceWithCommas } from "@/utils/printPriceWithCommas";
 import { Box, Button, Typography } from "@mui/material";
+import { useTheme } from "@mui/styles";
+import { Link } from "react-router-dom";
 
-function ProductItem({ name, desc, price }) {
-  //   const { src, name, price, desc } = item;
+function ProductItem({ product }) {
+  const { name, image, description, price } = product;
+  const theme = useTheme();
+
   return (
     <Box>
       <img
-        src="https://drake.vn/image/cache/catalog/Palladium/77357-001-M/77357-001-M_1-300x300.jpg"
+        src={image || "https://drake.vn/image/cache/catalog/Palladium/77357-001-M/77357-001-M_1-300x300.jpg"}
         alt=""
         style={{ width: "100%" }}
       />
@@ -21,23 +25,25 @@ function ProductItem({ name, desc, price }) {
           textOverflow: "ellipsis",
         }}
       >
-        {name}
+        <Link
+          to={`/products/${product._id}`}
+          state={{ product: product }}
+          style={{ color: theme.palette.primary.main }}
+        >
+          {name}
+        </Link>
       </Typography>
+
       <Typography sx={{ mt: "5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {desc}
+        {description}
       </Typography>
       <Typography sx={{ mt: "5px" }}>{printPriceWithCommas(price)}</Typography>
       <Button
         sx={{
-          // color: "#212121",
-          border: "1px solid #212121",
+          border: `1px solid ${theme.palette.primary.main}`,
           borderRadius: 4,
           mt: 2,
           paddingX: 2,
-          "&:hover": {
-            // backgroundColor: "#212121",
-            // color: "#fafafa",
-          },
         }}
       >
         Add to cart

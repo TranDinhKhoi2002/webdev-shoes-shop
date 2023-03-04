@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Button, IconButton, Input } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import React, { useImperativeHandle, useState } from "react";
+import { makeStyles } from "@mui/styles";
+import { Box, IconButton, Input } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 
 const useStyles = makeStyles({
   root: {
@@ -28,39 +28,42 @@ const useStyles = makeStyles({
   },
 });
 
-function NumberBox(props) {
-  const { value, onChange, max, min } = props;
+export default React.forwardRef((props, ref) => {
+  const { max, min } = props;
   const classes = useStyles();
-  const [localValue, setLocalValue] = useState(value);
+  const [localValue, setLocalValue] = useState(1);
+
+  useImperativeHandle(ref, () => ({
+    getQuantiry: () => {
+      return localValue;
+    },
+  }));
 
   const handleInputChange = (event) => {
-    let newValue = Number(event.target.value);
+    const newValue = Number(event.target.value);
     if (!isNaN(newValue) && newValue >= min && newValue <= max) {
       setLocalValue(newValue);
-      onChange(newValue);
     }
   };
 
   const handleIncrement = () => {
-    let newValue = localValue + 1;
+    const newValue = localValue + 1;
     if (newValue <= max) {
       setLocalValue(newValue);
-      onChange(newValue);
     }
   };
 
   const handleDecrement = () => {
-    let newValue = localValue - 1;
+    const newValue = localValue - 1;
     if (newValue >= min) {
       setLocalValue(newValue);
-      onChange(newValue);
     }
   };
 
   return (
-    <div className={classes.root}>
-      <IconButton onClick={handleDecrement} disabled={localValue <= min} className={classes.iconButton} >
-          <RemoveIcon />
+    <Box className={classes.root}>
+      <IconButton onClick={handleDecrement} disabled={localValue <= min} className={classes.iconButton}>
+        <RemoveIcon />
       </IconButton>
       <Input
         value={localValue}
@@ -75,8 +78,6 @@ function NumberBox(props) {
       <IconButton onClick={handleIncrement} disabled={localValue >= max} className={classes.iconButton}>
         <AddIcon />
       </IconButton>
-    </div>
+    </Box>
   );
-}
-
-export default NumberBox;
+});

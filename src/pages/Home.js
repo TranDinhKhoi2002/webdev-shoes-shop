@@ -30,6 +30,7 @@ function Home() {
 
   const getProducts = async (brandName) => {
     const products = await getProductsByBrand(brandName);
+    console.log(products);
     setProducts(products);
   };
 
@@ -83,7 +84,7 @@ function Home() {
           {products ? (
             products.map((product) => (
               <Grid key={product._id} item xs={6} md={4} lg={3}>
-                <ProductItem name={product.name} price={product.price} desc={product.description} />
+                <ProductItem product={product} />
               </Grid>
             ))
           ) : (

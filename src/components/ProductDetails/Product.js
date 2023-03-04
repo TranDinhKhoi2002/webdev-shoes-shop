@@ -1,24 +1,22 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import { makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import CardMedia from "@mui/material/CardMedia";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { Link } from "react-router-dom";
 import Rating from "@/components/Rating/Rating";
-import NumberBox from "@/components/ProductDetails/NumberBox/NumberBox";
+import NumberBox from "@/components/ProductDetails/NumberBox";
+import { Container } from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     padding: theme.spacing(2),
-    width: "70%",
+    width: "80%",
     margin: "auto",
     [theme.breakpoints.down("sm")]: {
       width: "90%",
@@ -120,126 +118,99 @@ const row = {
 };
 
 export default function ProductDetail() {
+  const [currentSize, setCurrentSize] = useState();
   const classes = useStyles();
-  const [imagenow, setImage] = useState(row.url);
-  const [selectedImage, setSelectedImage] = useState(row.url);
-  {
-    /* click ảnh bên dưới */
-  }
-  const handleImageClick = (image) => {
-    setImage(image);
-    setSelectedImage(image);
-  };
-  {
-    /* click ảnh bên phải*/
-  }
-  const handleImageClick2 = (imageUrl) => {
-    setImage(imageUrl);
-    setSelectedImage(imageUrl);
-  };
-  {
-    /* số lượng */
-  }
-  const [quantity, setQuantity] = useState(1);
-  const handleQuantityChange = (newQuantity) => {
-    setQuantity(newQuantity);
+
+  const ref = useRef();
+  const location = useLocation();
+  const product = location.state.product;
+
+  const handleChangeSize = (size) => {
+    setCurrentSize(size);
   };
 
   return (
-    <div className={classes.root}>
-      <IconButton aria-label="back">
-        <Link to="/">
-          {" "}
-          {/* cần link cái này về home */}
-          <ArrowBackIcon />
-        </Link>
-      </IconButton>
-      <Grid container spacing={2}>
-        {/* bên trái */}
+    <Container maxWidth="xl" sx={{ mt: 5 }}>
+      <Grid container spacing={4}>
         <Grid item xs={12} sm={6}>
-          {/* ảnh lớn */}
           <Card>
-            <CardMedia className={classes.media} image={imagenow} title="row" />
+            <CardMedia className={classes.media} image={product.image} title="row" />
           </Card>
-          {/* các hình ảnh bên dưới */}
           <Grid container className={classes.imageGrid} justify="center" spacing={2}>
-            {/* sản phẩm chính */}
             <Grid item>
               <Card>
-                <CardMedia
-                  className={classes.smallImage}
-                  image={row.url}
-                  title="row"
-                  onClick={() => handleImageClick(row.url)}
-                />
+                <CardMedia className={classes.smallImage} image={row.url} title="row" />
               </Card>
             </Grid>
-            {/* map các ảnh sản phẩm cùng loại, khác màu */}
             {Object.values(row.images).map((image, id) => (
-              <Grid item>
+              <Grid item key={id}>
                 <Card>
-                  <CardMedia
-                    className={classes.smallImage}
-                    key={id}
-                    image={image.imageUrl}
-                    onClick={() => handleImageClick(image.imageUrl)}
-                  />
+                  <CardMedia className={classes.smallImage} image={image.imageUrl} />
                 </Card>
               </Grid>
             ))}
           </Grid>
         </Grid>
-        {/* Bên phải */}
-        <Grid item xs={12} sm={6} style={{ paddingLeft: "60px" }}>
-          {/* tên sp, rating, price, mô tả */}
+
+        <Grid item xs={12} sm={6}>
           <Typography variant="h3" component="h1">
-            {row.name}
+            {product.name}
           </Typography>
           <Rating value={row.votes} /> ({row.votePeople})
-          <Typography variant="subtitle1" color="textSecondary">
-            <h2>
-              Price: ${row.price.toFixed(2)} - Total: ${(row.price * quantity).toFixed(2)}
-            </h2>
+          <Typography variant="h6" sx={{ mt: 2 }} color="textSecondary">
+            Price: ${product.price.toFixed(2)}
           </Typography>
-          <CardContent className={classes.cardContent}>
-            <Typography variant="body2" component="p">
-              {row.description}
-            </Typography>
-          </CardContent>
-          {/* chọn màu cho sản phẩm */}
-          <Typography variant="subtitle1" color="gray">
-            <h5>Choose a color:</h5>
+          <Typography variant="body2" component="p" sx={{ mt: 2 }}>
+            {product.description}
           </Typography>
-          {/* map các sản phẩm ra để chọn */}
-          <Grid container className={classes.imageGrid2} justify="center" spacing={2}>
+          <Typography variant="subtitle1" sx={{ marginY: 3 }} color="gray">
+            Choose a size:
+          </Typography>
+          <Grid container spacing={1}>
             <Grid item>
-              <CardMedia
-                className={`${classes.smallSmallImage} ${selectedImage === row.url && classes.selectedImage}`}
-                image={row.url}
-                title="row"
-                onClick={() => handleImageClick2(row.url)}
-              />
+              <Button
+                variant="outlined"
+                sx={{ border: currentSize && currentSize === "S" && 2 }}
+                onClick={handleChangeSize.bind(this, "S")}
+              >
+                S
+              </Button>
             </Grid>
-            {Object.values(row.images).map((image, id) => (
-              <Grid item key={id}>
-                <CardMedia
-                  className={`${classes.smallSmallImage} ${selectedImage === image.imageUrl && classes.selectedImage}`}
-                  image={image.imageUrl}
-                  onClick={() => handleImageClick2(image.imageUrl)}
-                />
-              </Grid>
-            ))}
+            <Grid item>
+              <Button
+                variant="outlined"
+                sx={{ border: currentSize && currentSize === "M" && 2 }}
+                onClick={handleChangeSize.bind(this, "M")}
+              >
+                M
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                sx={{ border: currentSize && currentSize === "L" && 2 }}
+                onClick={handleChangeSize.bind(this, "L")}
+              >
+                L
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                sx={{ border: currentSize && currentSize === "XL" && 2 }}
+                onClick={handleChangeSize.bind(this, "XL")}
+              >
+                XL
+              </Button>
+            </Grid>
           </Grid>
-          {/* số lượng chọn */}
-          <div>
-            <NumberBox value={quantity} onChange={handleQuantityChange} min={1} max={10} />
-          </div>
+          <NumberBox min={1} max={10} ref={ref} />
           <Button variant="contained" color="primary" className={classes.button}>
             Add to Cart
             <ShoppingCartIcon sx={{ marginLeft: 2 }} />
           </Button>
         </Grid>
       </Grid>
-    </div>
+    </Container>
   );
 }

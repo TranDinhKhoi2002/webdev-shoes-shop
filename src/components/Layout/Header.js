@@ -14,6 +14,7 @@ import {
   ListItemButton,
   Stack,
   Tooltip,
+  Badge,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -26,6 +27,8 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useLocation } from "react-router-dom";
 import PopperButton from "../UI/PopperButton";
+import { useSelector } from "react-redux";
+import { selectCartProducts } from "@/redux/slices/cart";
 
 const routes = [
   { name: "Home", link: "/" },
@@ -96,6 +99,8 @@ const Header = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
+  const products = useSelector(selectCartProducts);
+  console.log(products);
 
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -209,7 +214,9 @@ const Header = () => {
                   <Link to="/cart">
                     <Tooltip title="Cart">
                       <IconButton>
-                        <ShoppingCartIcon />
+                        <Badge badgeContent={products.length} color="info">
+                          <ShoppingCartIcon />
+                        </Badge>
                       </IconButton>
                     </Tooltip>
                   </Link>
