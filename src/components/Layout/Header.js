@@ -100,7 +100,6 @@ const Header = () => {
   const matches = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
   const products = useSelector(selectCartProducts);
-  console.log(products);
 
   const [openDrawer, setOpenDrawer] = useState(false);
 

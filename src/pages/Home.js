@@ -19,6 +19,10 @@ import ProductItem from "@/components/Products/ProductItem";
 import { useEffect, useState } from "react";
 import { useTheme } from "@mui/styles";
 import { getProductsByBrand } from "@/services/productServices";
+import { toast } from "react-toastify";
+import useDebounce from "@/hooks/useDebounce";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "@/redux/slices/auth";
 
 const images = [banner1, banner2, banner3];
 const brands = ["Converse", "Vans", "Nike", "Adidas", "Fila"];
@@ -26,7 +30,10 @@ const brands = ["Converse", "Vans", "Nike", "Adidas", "Fila"];
 function Home() {
   const [currentBrand, setCurrentBrand] = useState(brands[0]);
   const [products, setProducts] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
   const theme = useTheme();
+  const currentUser = useSelector(selectCurrentUser);
+  console.log(currentUser);
 
   const getProducts = async (brandName) => {
     const products = await getProductsByBrand(brandName);
@@ -42,7 +49,26 @@ function Home() {
     try {
       getProducts(brandName);
       setCurrentBrand(brandName);
-    } catch (error) {}
+    } catch (error) {
+      toast.error("Something went wrong!! Please try again");
+    }
+  };
+
+  const debouncedValue = useDebounce(searchValue, 500);
+  useEffect(() => {
+    if (debouncedValue.trim().length === 0) {
+      return;
+    }
+
+    const filteredProducts = products.filter((product) => product.name.toLowerCase().includes(debouncedValue));
+    setProducts(filteredProducts);
+  }, [debouncedValue, products]);
+
+  const handleInputChange = (e) => {
+    const searchInputValue = e.target.value;
+    if (!searchInputValue.startsWith(" ")) {
+      setSearchValue(searchInputValue);
+    }
   };
 
   return (
@@ -78,7 +104,11 @@ function Home() {
           <ButtonMenu />
         </Stack>
 
-        <TextField placeholder="Search your products by name" sx={{ marginY: 3, width: { xs: "100%", md: "380px" } }} />
+        <TextField
+          placeholder="Search your products by name"
+          sx={{ marginY: 3, width: { xs: "100%", md: "380px" } }}
+          onChange={handleInputChange}
+        />
 
         <Grid container spacing={2}>
           {products ? (

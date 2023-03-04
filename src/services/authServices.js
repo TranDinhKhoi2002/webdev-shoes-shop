@@ -1,13 +1,19 @@
 import request from "./baseService";
 
 export const signup = async (account) => {
-  const res = await request.post("/api/signup", account);
-  return res;
+  try {
+    const response = await request.post("/api/signup", account);
+    return { ...response.data, success: true };
+  } catch (error) {}
 };
 
 export const login = async (account) => {
-  const res = await request.post("/api/login", account);
-  return res;
+  try {
+    const response = await request.post("/api/login", account);
+    return { ...response.data, success: true };
+  } catch (error) {
+    return error.response ? error.response.data : { success: false, error: error.message };
+  }
 };
 
 export const requestNewPassword = async (email) => {

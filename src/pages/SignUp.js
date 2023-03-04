@@ -7,16 +7,18 @@ import Container from "@mui/system/Container";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import FormProvider from "@/components/Form/FormProvider";
-import { signup } from "@/services/authServices";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Box, Stack } from "@mui/material";
 import TextFieldRHF from "@/components/Form/TextFieldRHF";
 import { LoadingButton } from "@mui/lab";
+import { useDispatch } from "react-redux";
+import { fetchUserSignup } from "@/redux/slices/auth";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const SignUpSchema = Yup.object().shape({
     fullName: Yup.string().required("This is required"),
@@ -52,7 +54,6 @@ export default function SignUp() {
   } = methods;
 
   const onSubmit = async (values) => {
-    console.log(values);
     const account = {
       name: values.fullName,
       email: values.email,
@@ -63,8 +64,8 @@ export default function SignUp() {
     };
 
     try {
-      const res = await signup(account);
-      if (res.status === 201) {
+      const response = await dispatch(fetchUserSignup(account)).unwrap();
+      if (response) {
         toast.success("Signed up successfully!!");
         navigate("/", { replace: true });
       }

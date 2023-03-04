@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import * as authServices from "@/services/authServices";
 
 const initialState = {
   currentUser: undefined,
@@ -8,36 +9,44 @@ const initialState = {
 
 export const fetchCurrentUser = createAsyncThunk("auth/fetchCurrentUser", async () => {});
 
-export const fetchUserRegister = createAsyncThunk("auth/fetchUserRegister", async () => {});
+export const fetchUserSignup = createAsyncThunk("auth/fetchUserSignup", async (formData) => {
+  const response = await authServices.signup(formData);
+  return response;
+});
 
-export const fetchUserLogin = createAsyncThunk("auth/fetchUserLogin", async () => {});
+export const fetchUserLogin = createAsyncThunk("auth/fetchUserLogin", async (formData) => {
+  const response = await authServices.login(formData);
+  return response;
+});
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {
-    login(state, action) {
-      state.isAuth = true;
-
-      const { accountId, token, user } = action.payload;
-
-      const remainingMilliseconds = 60 * 60 * 1000;
-      const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
-      Cookies.set("token", token, { expires: expiryDate });
-      Cookies.set("accountId", accountId, { expires: expiryDate });
-
-      state.currentUser = user;
-    },
-    logout(state) {
-      state.isAuth = false;
-      Cookies.remove("token");
-      Cookies.remove("accountId");
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder.addCase(fetchCurrentUser.fulfilled, (state, { payload }) => {});
-    builder.addCase(fetchUserLogin.fulfilled, (state, { payload }) => {});
-    builder.addCase(fetchUserRegister.fulfilled, (state, { payload }) => {});
+    builder.addCase(fetchUserLogin.fulfilled, (state, { payload }) => {
+      const { success, token, user } = payload;
+
+      if (success) {
+        const remainingMilliseconds = 24 * 60 * 60 * 1000;
+        const expiryDate = new Date(new Date().getTime() + remainingMilliseconds);
+        Cookies.set("token", token, { expires: expiryDate });
+
+        state.currentUser = user;
+        state.isAuthenticated = true;
+      }
+    });
+    builder.addCase(fetchUserSignup.fulfilled, (state, { payload }) => {
+      const { success, user } = payload;
+
+      if (success) {
+        Cookies.set("user", user);
+
+        state.isAuthenticated = true;
+        state.currentUser = user;
+      }
+    });
   },
 });
 
