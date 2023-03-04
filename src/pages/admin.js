@@ -24,19 +24,23 @@ export default function Admin() {
     price: Yup.string()
       .required("This is required")
       .matches(/[0-9]+/gi, "Price must be a number"),
-    discount: Yup.number()
-      .typeError("Discount must be a number")
-      .required("This is required")
-      .nullable(true)
-      .transform((value) => {
-        if (value === null || isNaN(value)) {
-          return undefined;
-        } // transform null/NaN to undefined
-        return value; // return original value
-      })
-
-      .min(0, "Discount must be between 0 and 1")
-      .max(1, "Discount must be between 0 and 1"),
+    discount: Yup.mixed()
+      .nullable()
+      .test(
+        "valid-discount",
+        "Discount must be a number between 0 and 1",
+        function (value) {
+          if (value === null || value === "") {
+            return this.createError({ message: "This is required" });
+          }
+          if (isNaN(value) || value < 0 || value > 1) {
+            return this.createError({
+              message: "Discount must be a number between 0 and 1",
+            });
+          }
+          return true;
+        }
+      ),
     desc: Yup.string().required("This is required"),
   });
 
@@ -82,7 +86,11 @@ export default function Admin() {
             alignItems: "center",
           }}
         >
-          <Typography component="h1" variant="h5" sx={{ mt: 3, mb: 2 }}>
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{ mt: 3, mb: 2, fontWeight: "bold" }}
+          >
             Create Product
           </Typography>
 
@@ -132,6 +140,7 @@ export default function Admin() {
                 mb: 2,
                 padding: 1,
                 fontSize: "1.2rem",
+                fontWeight: "bold",
                 textTransform: "capitalize",
               }}
             >
