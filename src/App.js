@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import Cookies from "js-cookie";
 import { fetchCurrentUser } from "./redux/slices/auth";
 import { getCommonData } from "./redux/slices/data";
+import { assignProductsToCart } from "./redux/slices/cart";
 
 function App() {
   const dispatch = useDispatch();
@@ -18,8 +19,12 @@ function App() {
     const getData = async () => {
       const token = Cookies.get("token");
       if (token) {
-        await dispatch(fetchCurrentUser()).unwrap();
         await dispatch(getCommonData()).unwrap();
+
+        const { user } = await dispatch(fetchCurrentUser()).unwrap();
+        if (user) {
+          dispatch(assignProductsToCart({ cart: user.cart }));
+        }
       }
     };
 

@@ -22,7 +22,7 @@ export const login = async (account) => {
 
 export const getUserProfile = async () => {
   try {
-    const response = await request.get("/api/profile", {
+    const response = await request.get("/api/user/profile", {
       headers: {
         Authorization: `Bearer ${Cookies.get("token")}`,
       },

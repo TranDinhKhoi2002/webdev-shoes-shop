@@ -29,6 +29,7 @@ import { useLocation } from "react-router-dom";
 import PopperButton from "../UI/PopperButton";
 import { useSelector } from "react-redux";
 import { selectCartProducts } from "@/redux/slices/cart";
+import { selectCurrentUser } from "@/redux/slices/auth";
 
 const routes = [
   { name: "Home", link: "/" },
@@ -100,6 +101,8 @@ const Header = () => {
   const matches = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
   const products = useSelector(selectCartProducts);
+  const user = useSelector(selectCurrentUser);
+  console.log(user);
 
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -213,7 +216,7 @@ const Header = () => {
                   <Link to="/cart">
                     <Tooltip title="Cart">
                       <IconButton>
-                        <Badge badgeContent={products.length} color="info">
+                        <Badge badgeContent={user?.cart?.length} color="info">
                           <ShoppingCartIcon />
                         </Badge>
                       </IconButton>
