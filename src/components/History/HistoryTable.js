@@ -97,15 +97,18 @@ export default function HistoryTable() {
   useEffect(() => {
     const getHistory = async () => {
       const { receipts } = await dispatch(fetchGetUserHistory()).unwrap();
-      console.log(receipts);
-      setHistory(receipts);
+      if (receipts) {
+        setHistory(receipts);
+      } else {
+        setHistory([]);
+      }
     };
 
     getHistory();
   }, [dispatch]);
 
   const historyProducts = [];
-  history.forEach((item) => historyProducts.push(...item.products));
+  history?.forEach((item) => historyProducts.push(...item.products));
   console.log(historyProducts);
 
   const total = historyProducts.reduce((sum, cur) => sum + cur.quantity * +cur.unitPrice, 0);
