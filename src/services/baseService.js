@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const request = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://shoesshop.onrender.com/",
   headers: {
     "Content-Type": "application/json",
   },
