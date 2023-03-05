@@ -4,7 +4,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 const initialState = {
   brands: [],
   products: [],
-  history: {},
+  history: [],
 };
 
 export const fetchGetCommonData = createAsyncThunk("data/fetchGetCommonData", async () => {

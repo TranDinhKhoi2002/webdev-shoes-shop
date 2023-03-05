@@ -13,63 +13,9 @@ import TotalCostCard from "@/components/History/TotalCostCard";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fetchGetUserHistory } from "@/redux/slices/data";
-
-const rows = [
-  {
-    id: 1,
-    imageUrl: "https://images.pexels.com/photos/6748706/pexels-photo-6748706.jpeg",
-    name: "Example Website",
-    price: 100,
-    amount: 10,
-    total: 100,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 2,
-    imageUrl: "https://images.pexels.com/photos/1571467/pexels-photo-1571467.jpeg",
-    name: "Google",
-    price: 10,
-    amount: 100,
-    total: 10,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 3,
-    imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-    name: "Facebook",
-    price: 100,
-    amount: 10,
-    total: 100,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 4,
-    imageUrl: "https://images.pexels.com/photos/6748706/pexels-photo-6748706.jpeg",
-    name: "Example Website",
-    price: 10,
-    amount: 100,
-    total: 100,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 5,
-    imageUrl: "https://images.pexels.com/photos/1571467/pexels-photo-1571467.jpeg",
-    name: "Google",
-    price: 100,
-    amount: 100,
-    total: 10,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 6,
-    imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-    name: "Facebook",
-    price: 5,
-    amount: 100,
-    total: 100,
-    boughtAt: "2023-3-3",
-  },
-];
+import { useState } from "react";
+import EmptyHistory from "./EmptyHistory";
+import { printPriceWithCommas } from "@/utils/printPriceWithCommas";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -143,64 +89,79 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function HistoryTables() {
+export default function HistoryTable() {
   const classes = useStyles();
   const dispatch = useDispatch();
-
-  const total = rows.reduce((sum, row) => sum + row.total, 0);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
     const getHistory = async () => {
-      await dispatch(fetchGetUserHistory()).unwrap();
+      const { receipts } = await dispatch(fetchGetUserHistory()).unwrap();
+      console.log(receipts);
+      setHistory(receipts);
     };
 
     getHistory();
   }, [dispatch]);
 
+  const historyProducts = [];
+  history.forEach((item) => historyProducts.push(...item.products));
+  console.log(historyProducts);
+
+  const total = historyProducts.reduce((sum, cur) => sum + cur.quantity * +cur.unitPrice, 0);
+  console.log(total);
+
   return (
     <Box>
       <Typography variant="h3">Your History</Typography>
-      <TableContainer component={Paper} className={classes.center}>
-        <Table sx={{ minWidth: 500 }} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="right">
-                Image
-              </StyledTableCell>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="left">
-                Name
-              </StyledTableCell>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="left">
-                Price
-              </StyledTableCell>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
-                Amount
-              </StyledTableCell>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
-                Total
-              </StyledTableCell>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
-                Bought At
-              </StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <StyledTableRow key={row.id}>
-                <StyledTableCell className={classes.imageOn}>
-                  <img src={row.imageUrl} alt={row.name} className={classes.image} />
-                </StyledTableCell>
-                <StyledTableCell className={classes.name}>{row.name}</StyledTableCell>
-                <StyledTableCell className={classes.price}>${row.price}</StyledTableCell>
-                <StyledTableCell className={classes.amount}>{row.amount}</StyledTableCell>
-                <StyledTableCell className={classes.total}>${row.total}</StyledTableCell>
-                <StyledTableCell className={classes.boughtAt}>{new Date().toLocaleString()}</StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TotalCostCard totalCost={total} />
+      {history.length > 0 && (
+        <>
+          <TableContainer component={Paper} className={classes.center}>
+            <Table sx={{ minWidth: 500 }} aria-label="customized table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell sx={{ textTransform: "uppercase" }} align="right">
+                    Image
+                  </StyledTableCell>
+                  <StyledTableCell sx={{ textTransform: "uppercase" }} align="left">
+                    Name
+                  </StyledTableCell>
+                  <StyledTableCell sx={{ textTransform: "uppercase" }} align="left">
+                    Price
+                  </StyledTableCell>
+                  <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+                    Amount
+                  </StyledTableCell>
+                  <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+                    Total
+                  </StyledTableCell>
+                  <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+                    Bought At
+                  </StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {historyProducts.map((row, index) => (
+                  <StyledTableRow key={index}>
+                    <StyledTableCell className={classes.imageOn}>
+                      <img src={row.imageUrl} alt={row.name} className={classes.image} />
+                    </StyledTableCell>
+                    <StyledTableCell className={classes.name}>{row.name}</StyledTableCell>
+                    <StyledTableCell className={classes.price}>{printPriceWithCommas(row.unitPrice)}đ</StyledTableCell>
+                    <StyledTableCell className={classes.amount}>{row.quantity}</StyledTableCell>
+                    <StyledTableCell className={classes.total}>
+                      {printPriceWithCommas(row.quantity * +row.unitPrice)}đ
+                    </StyledTableCell>
+                    <StyledTableCell className={classes.boughtAt}>{new Date().toLocaleString()}</StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TotalCostCard totalCost={total} />
+        </>
+      )}
+      {history.length === 0 && <EmptyHistory />}
     </Box>
   );
 }

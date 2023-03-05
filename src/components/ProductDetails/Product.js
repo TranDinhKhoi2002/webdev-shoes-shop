@@ -142,7 +142,6 @@ export default function ProductDetail() {
 
     const quantity = ref.current.getQuantity();
     const remainingProducts = currentSize.quantity - currentSize.sold;
-    console.log(quantity, remainingProducts);
     if (quantity > remainingProducts) {
       toast.error("We don't have enough products, please choose less");
       return;

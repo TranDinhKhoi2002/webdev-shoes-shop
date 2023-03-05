@@ -1,4 +1,10 @@
-import { addToCart as addToCartApi, updateQuantity, removeItemsFromCart, checkoutCart } from "@/services/cartServices";
+import {
+  addToCart as addToCartApi,
+  updateQuantity,
+  removeItemsFromCart,
+  checkoutCart,
+  createReceipt,
+} from "@/services/cartServices";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
@@ -25,6 +31,11 @@ export const fetchRemoveItemsFromCart = createAsyncThunk("cart/fetchRemoveItemsF
 
 export const fetchCheckoutCart = createAsyncThunk("cart/fetchCheckoutCart", async () => {
   const response = await checkoutCart();
+  return response;
+});
+
+export const fetchCreateReceipt = createAsyncThunk("cart/fetchCreateReceipt", async (receipt) => {
+  const response = await createReceipt(receipt);
   return response;
 });
 

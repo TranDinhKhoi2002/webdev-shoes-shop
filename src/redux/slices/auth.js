@@ -35,6 +35,7 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchCurrentUser.fulfilled, (state, { payload }) => {
       const { success, user } = payload;
+      console.log(user);
 
       if (success) {
         state.currentUser = user;

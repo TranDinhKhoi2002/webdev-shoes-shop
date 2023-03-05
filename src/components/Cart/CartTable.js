@@ -14,9 +14,9 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import CartTableHead from "./CartTableHead";
 import CartTableToolbar from "./CartTableToolbar";
 import { printPriceWithCommas } from "@/utils/printPriceWithCommas";
-import { Button, IconButton, Stack, Typography } from "@mui/material";
+import { Button, IconButton, Modal, Stack, Typography } from "@mui/material";
 import EmptyCart from "./EmptyCart";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -28,10 +28,23 @@ import {
   addToCart,
   checkOut,
   updateAmountOfProduct,
+  fetchCreateReceipt,
 } from "@/redux/slices/cart";
 import { selectCurrentUser } from "@/redux/slices/auth";
 import * as _ from "lodash";
 import Cookies from "js-cookie";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -73,6 +86,7 @@ export default function CartTable() {
   const [rows, setRows] = useState([]);
   const dispatch = useDispatch();
   const [clicks, setClicks] = useState(0);
+  const [requestLoginModal, setRequestLoginModal] = useState(false);
 
   useEffect(() => {
     if (cartProducts || user) {
@@ -143,7 +157,9 @@ export default function CartTable() {
       if (success) {
         toast.success("Removed items successfully!!");
       }
-    } catch (error) {}
+    } catch (error) {
+      toast.error("Something went wrong!! Please try again");
+    }
   };
 
   const isSelected = (row) => selected.findIndex((item) => item._id === row._id && item.size === row.size) !== -1;
@@ -152,13 +168,38 @@ export default function CartTable() {
 
   const handleCheckout = async () => {
     if (!Boolean(token)) {
-      dispatch(checkOut());
+      // dispatch(checkOut());
+      // return;
+      setRequestLoginModal(true);
       return;
     }
 
     try {
-      const { success } = await dispatch(fetchCheckoutCart()).unwrap();
+      console.log(cartProducts);
+      const formatedProducts = cartProducts.map((product) => ({
+        productId: product.productId._id,
+        name: product.productId.name,
+        size: product.size,
+        quantity: product.quantity,
+        unitPrice: product.productId.price,
+      }));
+      console.log(user);
+      const { success } = await dispatch(
+        fetchCreateReceipt({
+          products: formatedProducts,
+          customerInfo: {
+            name: user.name,
+            phone: user.phone,
+            email: user.email,
+            address: user.address,
+          },
+          userId: user._id,
+        })
+      ).unwrap();
+      console.log(success);
+      // const { success } = await dispatch(fetchCheckoutCart()).unwrap();
       if (success) {
+        await dispatch(fetchCheckoutCart()).unwrap();
         navigate("/");
         return toast.success("Ordered successfully!!");
       }
@@ -173,7 +214,6 @@ export default function CartTable() {
 
   const token = Cookies.get("token");
   const clickOnce = async (click, product, size, quantity, mode) => {
-    console.log("here", quantity);
     if (!Boolean(token)) {
       if (mode === "dec") {
         dispatch(updateAmountOfProduct({ id: product._id, size, quantity }));
@@ -203,125 +243,148 @@ export default function CartTable() {
   );
 
   return (
-    <Box sx={{ width: "100%" }}>
-      {rows && rows.length > 0 && (
-        <>
-          <Paper sx={{ width: "100%", mb: 2 }}>
-            <CartTableToolbar numSelected={selected.length} onDelete={handleDelete} />
-            <TableContainer>
-              <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={"medium"}>
-                <CartTableHead
-                  numSelected={selected.length}
-                  order={order}
-                  orderBy={orderBy}
-                  onSelectAllClick={handleSelectAllClick}
-                  onRequestSort={handleRequestSort}
-                  rowCount={rows.length}
-                />
-                <TableBody>
-                  {stableSort(rows, getComparator(order, orderBy))
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row, index) => {
-                      console.log(row);
-                      const isItemSelected = isSelected(row);
-                      const labelId = `enhanced-table-checkbox-${index}`;
+    <>
+      <Box sx={{ width: "100%" }}>
+        {rows && rows.length > 0 && (
+          <>
+            <Paper sx={{ width: "100%", mb: 2 }}>
+              <CartTableToolbar numSelected={selected.length} onDelete={handleDelete} />
+              <TableContainer>
+                <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={"medium"}>
+                  <CartTableHead
+                    numSelected={selected.length}
+                    order={order}
+                    orderBy={orderBy}
+                    onSelectAllClick={handleSelectAllClick}
+                    onRequestSort={handleRequestSort}
+                    rowCount={rows.length}
+                  />
+                  <TableBody>
+                    {stableSort(rows, getComparator(order, orderBy))
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row, index) => {
+                        const isItemSelected = isSelected(row);
+                        const labelId = `enhanced-table-checkbox-${index}`;
 
-                      return (
-                        <TableRow
-                          hover
-                          role="checkbox"
-                          aria-checked={isItemSelected}
-                          tabIndex={-1}
-                          key={index}
-                          selected={isItemSelected}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              color="secondary"
-                              checked={isItemSelected}
-                              inputProps={{
-                                "aria-labelledby": labelId,
-                              }}
-                              onClick={(event) => handleClick(event, row)}
-                            />
-                          </TableCell>
-                          <TableCell component="th" id={labelId} scope="row" align="center">
-                            <img src={row.productId.image} width={100} height={100} alt="" />
-                          </TableCell>
-                          <TableCell align="center">{row.productId.name}</TableCell>
-                          <TableCell align="center">{printPriceWithCommas(row.productId.price)}đ</TableCell>
-                          <TableCell align="center">{printPriceWithCommas(row.size)}</TableCell>
-                          <TableCell align="center">
-                            <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
-                              <IconButton
-                                onClick={() =>
-                                  debouncedClick(
-                                    clicks,
-                                    row.productId,
-                                    row.size,
-                                    !Boolean(token) ? 1 : row.quantity + 1,
-                                    "inc"
-                                  )
-                                }
-                              >
-                                <AddIcon />
-                              </IconButton>
-                              <Typography>{row.quantity}</Typography>
-                              <IconButton
-                                onClick={() => debouncedClick(clicks, row.productId, row.size, row.quantity - 1, "dec")}
-                              >
-                                <RemoveIcon />
-                              </IconButton>
-                            </Stack>
-                          </TableCell>
-                          <TableCell align="center">
-                            {printPriceWithCommas(row.productId.price * row.quantity)}đ
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  {emptyRows > 0 && (
-                    <TableRow
-                      style={{
-                        height: 53 * emptyRows,
-                      }}
-                    >
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Paper>
-          <Stack direction="row" justifyContent="space-between">
-            <Button
-              variant="contained"
-              sx={{ paddingX: 8, paddingY: 2, fontSize: "1rem", borderRadius: 4, textTransform: "uppercase" }}
-              onClick={handleContinueShopping}
-            >
-              Shop Now
+                        return (
+                          <TableRow
+                            hover
+                            role="checkbox"
+                            aria-checked={isItemSelected}
+                            tabIndex={-1}
+                            key={index}
+                            selected={isItemSelected}
+                          >
+                            <TableCell padding="checkbox">
+                              <Checkbox
+                                color="secondary"
+                                checked={isItemSelected}
+                                inputProps={{
+                                  "aria-labelledby": labelId,
+                                }}
+                                onClick={(event) => handleClick(event, row)}
+                              />
+                            </TableCell>
+                            <TableCell component="th" id={labelId} scope="row" align="center">
+                              <img src={row.productId.image} width={100} height={100} alt="" />
+                            </TableCell>
+                            <TableCell align="center">{row.productId.name}</TableCell>
+                            <TableCell align="center">{printPriceWithCommas(row.productId.price)}đ</TableCell>
+                            <TableCell align="center">{printPriceWithCommas(row.size)}</TableCell>
+                            <TableCell align="center">
+                              <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
+                                <IconButton
+                                  onClick={() =>
+                                    debouncedClick(
+                                      clicks,
+                                      row.productId,
+                                      row.size,
+                                      !Boolean(token) ? 1 : row.quantity + 1,
+                                      "inc"
+                                    )
+                                  }
+                                >
+                                  <AddIcon />
+                                </IconButton>
+                                <Typography>{row.quantity}</Typography>
+                                <IconButton
+                                  onClick={() =>
+                                    debouncedClick(clicks, row.productId, row.size, row.quantity - 1, "dec")
+                                  }
+                                >
+                                  <RemoveIcon />
+                                </IconButton>
+                              </Stack>
+                            </TableCell>
+                            <TableCell align="center">
+                              {printPriceWithCommas(row.productId.price * row.quantity)}đ
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    {emptyRows > 0 && (
+                      <TableRow
+                        style={{
+                          height: 53 * emptyRows,
+                        }}
+                      >
+                        <TableCell colSpan={6} />
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Paper>
+            <Stack direction="row" justifyContent="space-between">
+              <Button
+                variant="contained"
+                sx={{ paddingX: 8, paddingY: 2, fontSize: "1rem", borderRadius: 4, textTransform: "uppercase" }}
+                onClick={handleContinueShopping}
+              >
+                Shop Now
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ paddingX: 8, paddingY: 2, fontSize: "1rem", borderRadius: 4, textTransform: "uppercase" }}
+                onClick={handleCheckout}
+              >
+                Check Out
+              </Button>
+            </Stack>
+          </>
+        )}
+
+        {rows && rows?.length === 0 && <EmptyCart />}
+      </Box>
+      <Modal
+        open={requestLoginModal}
+        onClose={() => setRequestLoginModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            You need to login to checkout
+          </Typography>
+          <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 2 }}>
+            <Button variant="outlined" onClick={() => setRequestLoginModal(false)}>
+              Cancel
             </Button>
-            <Button
-              variant="contained"
-              sx={{ paddingX: 8, paddingY: 2, fontSize: "1rem", borderRadius: 4, textTransform: "uppercase" }}
-              onClick={handleCheckout}
-            >
-              Check Out
-            </Button>
+            <Link to="/login">
+              <Button variant="contained">Login</Button>
+            </Link>
           </Stack>
-        </>
-      )}
-
-      {rows && rows?.length === 0 && <EmptyCart />}
-    </Box>
+        </Box>
+      </Modal>
+    </>
   );
 }

@@ -56,3 +56,16 @@ export const checkoutCart = async () => {
     return error.response ? error.response.data : { success: false, error: error.message };
   }
 };
+
+export const createReceipt = async (receipt) => {
+  try {
+    const response = await request.post("/api/receipts", receipt, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("token")}`,
+      },
+    });
+    return { ...response.data, success: true };
+  } catch (error) {
+    return error.response ? error.response.data : { success: false, error: error.message };
+  }
+};
