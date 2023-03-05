@@ -8,3 +8,12 @@ export const getData = async () => {
     return error.response ? error.response.data : { error: error.message };
   }
 };
+
+export const getHistory = async () => {
+  try {
+    const response = await request.get("/api/history");
+    return { ...response.data, success: true };
+  } catch (error) {
+    return error.response ? error.response.data : { error: error.message };
+  }
+};

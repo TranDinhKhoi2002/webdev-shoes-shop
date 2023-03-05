@@ -10,63 +10,10 @@ import Paper from "@mui/material/Paper";
 import { makeStyles } from "@mui/styles";
 import { Box, Typography } from "@mui/material";
 import TotalCostCard from "@/components/History/TotalCostCard";
+import { useSelector } from "react-redux";
+import { selectUserHistory } from "@/redux/slices/data";
 
-const rows = [
-  {
-    id: 1,
-    imageUrl: "https://images.pexels.com/photos/6748706/pexels-photo-6748706.jpeg",
-    name: "Example Website",
-    price: 100,
-    amount: 10,
-    total: 100,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 2,
-    imageUrl: "https://images.pexels.com/photos/1571467/pexels-photo-1571467.jpeg",
-    name: "Google",
-    price: 10,
-    amount: 100,
-    total: 10,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 3,
-    imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-    name: "Facebook",
-    price: 100,
-    amount: 10,
-    total: 100,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 4,
-    imageUrl: "https://images.pexels.com/photos/6748706/pexels-photo-6748706.jpeg",
-    name: "Example Website",
-    price: 10,
-    amount: 100,
-    total: 100,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 5,
-    imageUrl: "https://images.pexels.com/photos/1571467/pexels-photo-1571467.jpeg",
-    name: "Google",
-    price: 100,
-    amount: 100,
-    total: 10,
-    boughtAt: "2023-3-3",
-  },
-  {
-    id: 6,
-    imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591",
-    name: "Facebook",
-    price: 5,
-    amount: 100,
-    total: 100,
-    boughtAt: "2023-3-3",
-  },
-];
+const userHistory = useSelector(selectUserHistory);
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -150,7 +97,10 @@ export default function HistoryTables() {
         <Table sx={{ minWidth: 500 }} aria-label="customized table">
           <TableHead>
             <TableRow>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="right">
+              <StyledTableCell
+                sx={{ textTransform: "uppercase" }}
+                align="right"
+              >
                 Image
               </StyledTableCell>
               <StyledTableCell sx={{ textTransform: "uppercase" }} align="left">
@@ -159,28 +109,51 @@ export default function HistoryTables() {
               <StyledTableCell sx={{ textTransform: "uppercase" }} align="left">
                 Price
               </StyledTableCell>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+              <StyledTableCell
+                sx={{ textTransform: "uppercase" }}
+                align="center"
+              >
                 Amount
               </StyledTableCell>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+              <StyledTableCell
+                sx={{ textTransform: "uppercase" }}
+                align="center"
+              >
                 Total
               </StyledTableCell>
-              <StyledTableCell sx={{ textTransform: "uppercase" }} align="center">
+              <StyledTableCell
+                sx={{ textTransform: "uppercase" }}
+                align="center"
+              >
                 Bought At
               </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {userHistory.map((row) => (
               <StyledTableRow key={row.id}>
                 <StyledTableCell className={classes.imageOn}>
-                  <img src={row.imageUrl} alt={row.name} className={classes.image} />
+                  <img
+                    src={row.imageUrl}
+                    alt={row.name}
+                    className={classes.image}
+                  />
                 </StyledTableCell>
-                <StyledTableCell className={classes.name}>{row.name}</StyledTableCell>
-                <StyledTableCell className={classes.price}>${row.price}</StyledTableCell>
-                <StyledTableCell className={classes.amount}>{row.amount}</StyledTableCell>
-                <StyledTableCell className={classes.total}>${row.total}</StyledTableCell>
-                <StyledTableCell className={classes.boughtAt}>{new Date().toLocaleString()}</StyledTableCell>
+                <StyledTableCell className={classes.name}>
+                  {row.name}
+                </StyledTableCell>
+                <StyledTableCell className={classes.price}>
+                  ${row.price}
+                </StyledTableCell>
+                <StyledTableCell className={classes.amount}>
+                  {row.amount}
+                </StyledTableCell>
+                <StyledTableCell className={classes.total}>
+                  ${row.total}
+                </StyledTableCell>
+                <StyledTableCell className={classes.boughtAt}>
+                  {new Date().toLocaleString()}
+                </StyledTableCell>
               </StyledTableRow>
             ))}
           </TableBody>
