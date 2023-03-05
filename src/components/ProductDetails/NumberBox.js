@@ -34,7 +34,7 @@ export default React.forwardRef((props, ref) => {
   const [localValue, setLocalValue] = useState(1);
 
   useImperativeHandle(ref, () => ({
-    getQuantiry: () => {
+    getQuantity: () => {
       return localValue;
     },
   }));

@@ -11,6 +11,10 @@ import Rating from "@/components/Rating/Rating";
 import NumberBox from "@/components/ProductDetails/NumberBox";
 import { Container } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import { printPriceWithCommas } from "@/utils/printPriceWithCommas";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { fetchAddToCart } from "@/redux/slices/cart";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -120,6 +124,7 @@ const row = {
 export default function ProductDetail() {
   const [currentSize, setCurrentSize] = useState();
   const classes = useStyles();
+  const dispatch = useDispatch();
 
   const ref = useRef();
   const location = useLocation();
@@ -129,27 +134,38 @@ export default function ProductDetail() {
     setCurrentSize(size);
   };
 
+  const handleAddToCart = async () => {
+    if (!currentSize) {
+      toast.error("Please choose a size");
+      return;
+    }
+
+    const quantity = ref.current.getQuantity();
+    const remainingProducts = currentSize.quantity - currentSize.sold;
+    console.log(quantity, remainingProducts);
+    if (quantity > remainingProducts) {
+      toast.error("We don't have enough products, please choose less");
+      return;
+    }
+
+    try {
+      const { success } = await dispatch(
+        fetchAddToCart({ productId: product._id, size: currentSize.name, quantity })
+      ).unwrap();
+
+      if (success) {
+        toast.success("Added to cart successfully!!");
+      }
+    } catch (error) {}
+  };
+
   return (
-    <Container maxWidth="xl" sx={{ mt: 5 }}>
+    <Container maxWidth="xl" sx={{ mt: 10 }}>
       <Grid container spacing={4}>
         <Grid item xs={12} sm={6}>
           <Card>
             <CardMedia className={classes.media} image={product.image} title="row" />
           </Card>
-          <Grid container className={classes.imageGrid} justify="center" spacing={2}>
-            <Grid item>
-              <Card>
-                <CardMedia className={classes.smallImage} image={row.url} title="row" />
-              </Card>
-            </Grid>
-            {Object.values(row.images).map((image, id) => (
-              <Grid item key={id}>
-                <Card>
-                  <CardMedia className={classes.smallImage} image={image.imageUrl} />
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -158,7 +174,7 @@ export default function ProductDetail() {
           </Typography>
           <Rating value={row.votes} /> ({row.votePeople})
           <Typography variant="h6" sx={{ mt: 2 }} color="textSecondary">
-            Price: ${product.price.toFixed(2)}
+            Price: {printPriceWithCommas(product.price)}đ
           </Typography>
           <Typography variant="body2" component="p" sx={{ mt: 2 }}>
             {product.description}
@@ -167,45 +183,21 @@ export default function ProductDetail() {
             Choose a size:
           </Typography>
           <Grid container spacing={1}>
-            <Grid item>
-              <Button
-                variant="outlined"
-                sx={{ border: currentSize && currentSize === "S" && 2 }}
-                onClick={handleChangeSize.bind(this, "S")}
-              >
-                S
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                sx={{ border: currentSize && currentSize === "M" && 2 }}
-                onClick={handleChangeSize.bind(this, "M")}
-              >
-                M
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                sx={{ border: currentSize && currentSize === "L" && 2 }}
-                onClick={handleChangeSize.bind(this, "L")}
-              >
-                L
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                variant="outlined"
-                sx={{ border: currentSize && currentSize === "XL" && 2 }}
-                onClick={handleChangeSize.bind(this, "XL")}
-              >
-                XL
-              </Button>
-            </Grid>
+            {product.sizes.map((size) => (
+              <Grid item key={size._id}>
+                <Button
+                  variant="outlined"
+                  disabled={size.quantity - size.sold === 0}
+                  sx={{ border: currentSize?.name === size.name && 2 }}
+                  onClick={handleChangeSize.bind(this, size)}
+                >
+                  {size.name}
+                </Button>
+              </Grid>
+            ))}
           </Grid>
           <NumberBox min={1} max={10} ref={ref} />
-          <Button variant="contained" color="primary" className={classes.button}>
+          <Button variant="contained" color="primary" className={classes.button} onClick={handleAddToCart}>
             Add to Cart
             <ShoppingCartIcon sx={{ marginLeft: 2 }} />
           </Button>

@@ -37,7 +37,6 @@ function ProductItem({ product }) {
 
     const token = Cookies.get("token");
     if (!Boolean(token)) {
-      console.log(123);
       dispatch(addToCart({ productId: product, size, quantity }));
       return;
     }

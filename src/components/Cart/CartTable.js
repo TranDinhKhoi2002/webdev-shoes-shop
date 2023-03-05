@@ -27,7 +27,6 @@ import {
   fetchCheckoutCart,
   addToCart,
   checkOut,
-  removeFromCart,
   updateAmountOfProduct,
 } from "@/redux/slices/cart";
 import { selectCurrentUser } from "@/redux/slices/auth";
@@ -147,8 +146,7 @@ export default function CartTable() {
     } catch (error) {}
   };
 
-  const isSelected = (row) =>
-    selected.findIndex((item) => item.productId._id === row.productId._id && item.size === row.size) !== -1;
+  const isSelected = (row) => selected.findIndex((item) => item._id === row._id && item.size === row.size) !== -1;
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cartProducts?.length) : 0;
 
@@ -172,10 +170,6 @@ export default function CartTable() {
   const handleContinueShopping = () => {
     navigate("/");
   };
-
-  // const handleIncreaseQuantity = async () => {
-
-  // }
 
   const token = Cookies.get("token");
   const clickOnce = async (click, product, size, quantity, mode) => {
@@ -228,6 +222,7 @@ export default function CartTable() {
                   {stableSort(rows, getComparator(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
+                      console.log(row);
                       const isItemSelected = isSelected(row);
                       const labelId = `enhanced-table-checkbox-${index}`;
 
