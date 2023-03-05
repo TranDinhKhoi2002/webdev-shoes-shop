@@ -23,11 +23,16 @@ import {
   selectCartProducts,
   assignProductsToCart,
   fetchUpdateQuantity,
-  fetchRemoveFromCart,
+  fetchRemoveItemsFromCart,
   fetchCheckoutCart,
+  addToCart,
+  checkOut,
+  removeFromCart,
+  updateAmountOfProduct,
 } from "@/redux/slices/cart";
 import { selectCurrentUser } from "@/redux/slices/auth";
 import * as _ from "lodash";
+import Cookies from "js-cookie";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -122,11 +127,24 @@ export default function CartTable() {
 
   const handleDelete = async () => {
     const currentRows = [...rows];
-    const restRows = currentRows.filter((row) => !selected.includes(row._id));
-
-    dispatch(assignProductsToCart({ cart: restRows }));
+    const restRows = currentRows.filter(
+      (row) => selected.findIndex((item) => item.productId._id === row.productId._id && item.size === row.size) === -1
+    );
     setRows(restRows);
     setSelected([]);
+
+    if (!Boolean(token)) {
+      dispatch(assignProductsToCart({ cart: restRows }));
+      return;
+    }
+
+    try {
+      const removedItems = selected.map((item) => ({ productId: item.productId._id, size: item.size }));
+      const { success } = await dispatch(fetchRemoveItemsFromCart({ items: removedItems })).unwrap();
+      if (success) {
+        toast.success("Removed items successfully!!");
+      }
+    } catch (error) {}
   };
 
   const isSelected = (row) =>
@@ -135,6 +153,11 @@ export default function CartTable() {
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cartProducts?.length) : 0;
 
   const handleCheckout = async () => {
+    if (!Boolean(token)) {
+      dispatch(checkOut());
+      return;
+    }
+
     try {
       const { success } = await dispatch(fetchCheckoutCart()).unwrap();
       if (success) {
@@ -150,8 +173,24 @@ export default function CartTable() {
     navigate("/");
   };
 
-  const clickOnce = async (click, productId, size, quantity) => {
-    const { cart } = await dispatch(fetchUpdateQuantity({ productId, size, quantity })).unwrap();
+  // const handleIncreaseQuantity = async () => {
+
+  // }
+
+  const token = Cookies.get("token");
+  const clickOnce = async (click, product, size, quantity, mode) => {
+    console.log("here", quantity);
+    if (!Boolean(token)) {
+      if (mode === "dec") {
+        dispatch(updateAmountOfProduct({ id: product._id, size, quantity }));
+        return;
+      }
+
+      dispatch(addToCart({ productId: product, size, quantity }));
+      return;
+    }
+
+    const { cart } = await dispatch(fetchUpdateQuantity({ productId: product._id, size, quantity })).unwrap();
     dispatch(assignProductsToCart({ cart }));
 
     setRows(cart);
@@ -160,8 +199,8 @@ export default function CartTable() {
 
   const debouncedClick = useCallback(
     _.debounce(
-      (clicks, productId, size, quantity) => {
-        clickOnce(clicks, productId, size, quantity);
+      (clicks, product, size, quantity, mode) => {
+        clickOnce(clicks, product, size, quantity, mode);
       },
       1000,
       { leading: true, trailing: false, maxWait: 1000 }
@@ -189,7 +228,6 @@ export default function CartTable() {
                   {stableSort(rows, getComparator(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
-                      console.log(row);
                       const isItemSelected = isSelected(row);
                       const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -221,13 +259,21 @@ export default function CartTable() {
                           <TableCell align="center">
                             <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
                               <IconButton
-                                onClick={() => debouncedClick(clicks, row.productId._id, row.size, row.quantity + 1)}
+                                onClick={() =>
+                                  debouncedClick(
+                                    clicks,
+                                    row.productId,
+                                    row.size,
+                                    !Boolean(token) ? 1 : row.quantity + 1,
+                                    "inc"
+                                  )
+                                }
                               >
                                 <AddIcon />
                               </IconButton>
                               <Typography>{row.quantity}</Typography>
                               <IconButton
-                                onClick={() => debouncedClick(clicks, row.productId._id, row.size, row.quantity - 1)}
+                                onClick={() => debouncedClick(clicks, row.productId, row.size, row.quantity - 1, "dec")}
                               >
                                 <RemoveIcon />
                               </IconButton>

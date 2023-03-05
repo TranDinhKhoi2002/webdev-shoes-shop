@@ -1,9 +1,4 @@
-import {
-  addToCart as addToCartApi,
-  updateQuantity,
-  removeFromCart as removeFromCartApi,
-  checkoutCart,
-} from "@/services/cartServices";
+import { addToCart as addToCartApi, updateQuantity, removeItemsFromCart, checkoutCart } from "@/services/cartServices";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
@@ -23,8 +18,8 @@ export const fetchUpdateQuantity = createAsyncThunk("cart/fetchUpdateQuantity", 
   return response;
 });
 
-export const fetchRemoveFromCart = createAsyncThunk("cart/fetchRemoveFromCart", async (itemsData) => {
-  const response = await removeFromCartApi(itemsData);
+export const fetchRemoveItemsFromCart = createAsyncThunk("cart/fetchRemoveItemsFromCart", async (itemsData) => {
+  const response = await removeItemsFromCart(itemsData);
   return response;
 });
 
@@ -51,19 +46,18 @@ const cartSlice = createSlice({
       if (itemIndex === -1) {
         const product = { ...action.payload };
         state.products.push(product);
-        console.log("here");
       } else {
-        console.log("here 2");
         state.products[itemIndex].quantity += quantity;
       }
 
       localStorage.setItem(`cart-${sessionID}`, JSON.stringify(state.products));
     },
     removeFromCart(state, action) {
+      console.log(action.payload);
       state.products = state.products.filter(
         (item) =>
-          (item.product._id === action.payload.id && item.size !== action.payload.size) ||
-          item.product._id !== action.payload.id
+          (item.productId._id === action.payload.id && item.size !== action.payload.size) ||
+          item.productId._id !== action.payload.id
       );
 
       const sessionID = localStorage.getItem("sessionID");
@@ -75,16 +69,16 @@ const cartSlice = createSlice({
       localStorage.setItem(`cart-${sessionID}`, JSON.stringify(state.products));
     },
     updateAmountOfProduct(state, action) {
-      if (action.payload.amount === "0") {
+      if (action.payload.quantity === 0) {
         state.products = state.products.filter(
-          (item) => item.product._id === action.payload.id && item.size !== action.payload.size
+          (item) => item.productId._id === action.payload.id && item.size !== action.payload.size
         );
       } else {
         const itemIndex = state.products.findIndex(
-          (item) => item.product._id === action.payload.id && item.size === action.payload.size
+          (item) => item.productId._id === action.payload.id && item.size === action.payload.size
         );
 
-        state.products[itemIndex].amount = +action.payload.amount;
+        state.products[itemIndex].quantity = action.payload.quantity;
       }
 
       const sessionID = localStorage.getItem("sessionID");
@@ -118,7 +112,7 @@ const cartSlice = createSlice({
         state.products = cart;
       }
     });
-    builder.addCase(fetchRemoveFromCart.fulfilled, (state, { payload }) => {
+    builder.addCase(fetchRemoveItemsFromCart.fulfilled, (state, { payload }) => {
       const { success, cart } = payload;
 
       if (success) {

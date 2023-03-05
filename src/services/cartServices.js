@@ -27,9 +27,9 @@ export const updateQuantity = async (item) => {
   }
 };
 
-export const removeFromCart = async (items) => {
+export const removeItemsFromCart = async (items) => {
   try {
-    const response = await request.put("/api/user/cart/remove", items, {
+    const response = await request.put("/api/user/cart/remove-some", items, {
       headers: {
         Authorization: `Bearer ${Cookies.get("token")}`,
       },
