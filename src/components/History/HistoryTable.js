@@ -144,7 +144,7 @@ export default function HistoryTable() {
                 {historyProducts.map((row, index) => (
                   <StyledTableRow key={index}>
                     <StyledTableCell className={classes.imageOn}>
-                      <img src={row.imageUrl} alt={row.name} className={classes.image} />
+                      <img src={row.productId.image} alt={row.name} className={classes.image} />
                     </StyledTableCell>
                     <StyledTableCell className={classes.name}>{row.name}</StyledTableCell>
                     <StyledTableCell className={classes.price}>{printPriceWithCommas(row.unitPrice)}đ</StyledTableCell>
