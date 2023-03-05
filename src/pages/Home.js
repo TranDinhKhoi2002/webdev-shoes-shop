@@ -25,7 +25,6 @@ import { useSelector } from "react-redux";
 import { selectBrands, selectProducts } from "@/redux/slices/data";
 
 const images = [banner1, banner2, banner3];
-// const brands = ["Converse", "Vans", "Nike", "Adidas", "Fila"];
 
 function Home() {
   const loadedProducts = useSelector(selectProducts);

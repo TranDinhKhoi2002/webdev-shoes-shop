@@ -27,14 +27,13 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useLocation } from "react-router-dom";
 import PopperButton from "../UI/PopperButton";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectCartProducts } from "@/redux/slices/cart";
-import { selectCurrentUser } from "@/redux/slices/auth";
+import { logout, selectIsAuthenticated } from "@/redux/slices/auth";
 
 const routes = [
   { name: "Home", link: "/" },
   { name: "History", link: "/history" },
-  { name: "Product", link: "/product" },
 ];
 
 function ElevationScroll(props) {
@@ -100,9 +99,9 @@ const Header = () => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
-  const products = useSelector(selectCartProducts);
-  const user = useSelector(selectCurrentUser);
-  console.log(user);
+  const cartProducts = useSelector(selectCartProducts);
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const dispatch = useDispatch();
 
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -169,7 +168,7 @@ const Header = () => {
     </>
   );
 
-  const popperButtonItems = [
+  let popperButtonItems = [
     {
       title: "Log In",
       onClick: () => {
@@ -183,6 +182,23 @@ const Header = () => {
       },
     },
   ];
+
+  if (isAuthenticated) {
+    popperButtonItems = [
+      {
+        title: "Log Out",
+        onClick: () => {
+          dispatch(logout());
+        },
+      },
+      {
+        title: "Sign Up",
+        onClick: () => {
+          navigate("/signup");
+        },
+      },
+    ];
+  }
 
   return (
     <>
@@ -216,7 +232,7 @@ const Header = () => {
                   <Link to="/cart">
                     <Tooltip title="Cart">
                       <IconButton>
-                        <Badge badgeContent={user?.cart?.length} color="info">
+                        <Badge badgeContent={cartProducts?.length} color="info">
                           <ShoppingCartIcon />
                         </Badge>
                       </IconButton>

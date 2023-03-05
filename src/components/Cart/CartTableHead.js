@@ -15,7 +15,7 @@ const headCells = [
     id: "image",
     numeric: false,
     disablePadding: true,
-    label: "Product Image",
+    label: "Image",
     flex: 1,
   },
   {
@@ -30,6 +30,13 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: "Price",
+    flex: 1,
+  },
+  {
+    id: "size",
+    numeric: true,
+    disablePadding: false,
+    label: "Size",
     flex: 1,
   },
   {

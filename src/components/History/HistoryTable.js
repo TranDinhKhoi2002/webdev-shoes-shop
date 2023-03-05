@@ -10,6 +10,9 @@ import Paper from "@mui/material/Paper";
 import { makeStyles } from "@mui/styles";
 import { Box, Typography } from "@mui/material";
 import TotalCostCard from "@/components/History/TotalCostCard";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchGetUserHistory } from "@/redux/slices/data";
 
 const rows = [
   {
@@ -142,7 +145,18 @@ const useStyles = makeStyles((theme) => ({
 
 export default function HistoryTables() {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const total = rows.reduce((sum, row) => sum + row.total, 0);
+
+  useEffect(() => {
+    const getHistory = async () => {
+      await dispatch(fetchGetUserHistory()).unwrap();
+    };
+
+    getHistory();
+  }, [dispatch]);
+
   return (
     <Box>
       <Typography variant="h3">Your History</Typography>

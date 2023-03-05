@@ -1,13 +1,35 @@
-import { addToCart as addToCartApi } from "@/services/cartServices";
+import {
+  addToCart as addToCartApi,
+  updateQuantity,
+  removeFromCart as removeFromCartApi,
+  checkoutCart,
+} from "@/services/cartServices";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 
 const initialState = {
-  products: JSON.parse(localStorage.getItem(`cart-${localStorage.getItem("sessionID")}`)) || [],
+  products: localStorage.getItem(`cart-${localStorage.getItem("sessionID")}`)
+    ? JSON.parse(localStorage.getItem(`cart-${localStorage.getItem("sessionID")}`))
+    : [],
 };
 
 export const fetchAddToCart = createAsyncThunk("cart/fetchAddToCart", async (itemData) => {
   const response = await addToCartApi(itemData);
+  return response;
+});
+
+export const fetchUpdateQuantity = createAsyncThunk("cart/fetchUpdateQuantity", async (itemData) => {
+  const response = await updateQuantity(itemData);
+  return response;
+});
+
+export const fetchRemoveFromCart = createAsyncThunk("cart/fetchRemoveFromCart", async (itemsData) => {
+  const response = await removeFromCartApi(itemsData);
+  return response;
+});
+
+export const fetchCheckoutCart = createAsyncThunk("cart/fetchCheckoutCart", async () => {
+  const response = await checkoutCart();
   return response;
 });
 
@@ -16,7 +38,7 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart(state, action) {
-      const { product, size } = action.payload;
+      const { productId, size, quantity } = action.payload;
 
       let sessionID = localStorage.getItem("sessionID");
       if (!sessionID) {
@@ -24,13 +46,15 @@ const cartSlice = createSlice({
         localStorage.setItem("sessionID", sessionID);
       }
 
-      const itemIndex = state.products.findIndex((item) => item.product._id === product._id && item.size === size);
+      const itemIndex = state.products.findIndex((item) => item.productId._id === productId._id && item.size === size);
 
       if (itemIndex === -1) {
-        const product = { ...action.payload, amount: 1 };
+        const product = { ...action.payload };
         state.products.push(product);
+        console.log("here");
       } else {
-        state.products[itemIndex].amount++;
+        console.log("here 2");
+        state.products[itemIndex].quantity += quantity;
       }
 
       localStorage.setItem(`cart-${sessionID}`, JSON.stringify(state.products));
@@ -69,14 +93,43 @@ const cartSlice = createSlice({
     assignProductsToCart(state, action) {
       const { cart } = action.payload;
       state.products = cart;
+
+      let sessionID = localStorage.getItem("sessionID");
+      if (!sessionID) {
+        sessionID = uuidv4();
+        localStorage.setItem("sessionID", sessionID);
+      }
+
+      localStorage.setItem(`cart-${sessionID}`, JSON.stringify(cart));
     },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAddToCart.fulfilled, (state, { payload }) => {
-      const { success, updatedCart } = payload;
+      const { success, cart } = payload;
 
       if (success) {
-        state.products = updatedCart;
+        state.products = cart;
+      }
+    });
+    builder.addCase(fetchUpdateQuantity.fulfilled, (state, { payload }) => {
+      const { success, cart } = payload;
+
+      if (success) {
+        state.products = cart;
+      }
+    });
+    builder.addCase(fetchRemoveFromCart.fulfilled, (state, { payload }) => {
+      const { success, cart } = payload;
+
+      if (success) {
+        state.products = cart;
+      }
+    });
+    builder.addCase(fetchCheckoutCart.fulfilled, (state, { payload }) => {
+      const { success } = payload;
+
+      if (success) {
+        state.products = [];
       }
     });
   },

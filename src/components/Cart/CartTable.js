@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -18,36 +18,16 @@ import { Button, IconButton, Stack, Typography } from "@mui/material";
 import EmptyCart from "./EmptyCart";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
-function createData(image, name, price, amount) {
-  return {
-    image,
-    name,
-    price,
-    amount,
-  };
-}
-
-const dataRows = [
-  createData(
-    "https://drake.vn/image/cache/catalog/Palladium/77357-001-M/77357-001-M_1-300x300.jpg",
-    "PALLADIUM PAMPA HI 1",
-    399000,
-    2
-  ),
-  createData(
-    "https://drake.vn/image/cache/catalog/Palladium/77357-001-M/77357-001-M_1-300x300.jpg",
-    "PALLADIUM PAMPA HI 2",
-    399000,
-    2
-  ),
-  createData(
-    "https://drake.vn/image/cache/catalog/Palladium/77357-001-M/77357-001-M_1-300x300.jpg",
-    "PALLADIUM PAMPA HI 3",
-    399000,
-    2
-  ),
-];
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectCartProducts,
+  assignProductsToCart,
+  fetchUpdateQuantity,
+  fetchRemoveFromCart,
+  fetchCheckoutCart,
+} from "@/redux/slices/cart";
+import { selectCurrentUser } from "@/redux/slices/auth";
+import * as _ from "lodash";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -83,8 +63,19 @@ export default function CartTable() {
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [rows, setRows] = useState(dataRows);
   const navigate = useNavigate();
+  const cartProducts = useSelector(selectCartProducts);
+  const user = useSelector(selectCurrentUser);
+  const [rows, setRows] = useState([]);
+  const dispatch = useDispatch();
+  const [clicks, setClicks] = useState(0);
+
+  useEffect(() => {
+    if (cartProducts || user) {
+      console.log(cartProducts);
+      setRows(cartProducts);
+    }
+  }, [cartProducts, user]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -94,19 +85,21 @@ export default function CartTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
+      const newSelected = cartProducts.map((n) => n._id);
       setSelected(newSelected);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
+  const handleClick = (event, row) => {
+    const selectedIndex = selected.findIndex(
+      (item) => item.productId._id === row.productId._id && item.size === row.size
+    );
     let newSelected = [];
 
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, row);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -127,29 +120,58 @@ export default function CartTable() {
     setPage(0);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     const currentRows = [...rows];
-    const restRows = currentRows.filter((row) => !selected.includes(row.name));
+    const restRows = currentRows.filter((row) => !selected.includes(row._id));
+
+    dispatch(assignProductsToCart({ cart: restRows }));
     setRows(restRows);
     setSelected([]);
   };
 
-  const isSelected = (name) => selected.indexOf(name) !== -1;
+  const isSelected = (row) =>
+    selected.findIndex((item) => item.productId._id === row.productId._id && item.size === row.size) !== -1;
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cartProducts?.length) : 0;
 
-  const handleCheckout = () => {
-    navigate("/");
-    return toast.success("Ordered successfully!!");
+  const handleCheckout = async () => {
+    try {
+      const { success } = await dispatch(fetchCheckoutCart()).unwrap();
+      if (success) {
+        navigate("/");
+        return toast.success("Ordered successfully!!");
+      }
+    } catch (error) {
+      toast.error("Something went wrong!! Please try again");
+    }
   };
 
   const handleContinueShopping = () => {
     navigate("/");
   };
 
+  const clickOnce = async (click, productId, size, quantity) => {
+    const { cart } = await dispatch(fetchUpdateQuantity({ productId, size, quantity })).unwrap();
+    dispatch(assignProductsToCart({ cart }));
+
+    setRows(cart);
+    setClicks(click + 1);
+  };
+
+  const debouncedClick = useCallback(
+    _.debounce(
+      (clicks, productId, size, quantity) => {
+        clickOnce(clicks, productId, size, quantity);
+      },
+      1000,
+      { leading: true, trailing: false, maxWait: 1000 }
+    ),
+    []
+  );
+
   return (
     <Box sx={{ width: "100%" }}>
-      {rows.length > 0 && (
+      {rows && rows.length > 0 && (
         <>
           <Paper sx={{ width: "100%", mb: 2 }}>
             <CartTableToolbar numSelected={selected.length} onDelete={handleDelete} />
@@ -167,7 +189,8 @@ export default function CartTable() {
                   {stableSort(rows, getComparator(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
-                      const isItemSelected = isSelected(row.name);
+                      console.log(row);
+                      const isItemSelected = isSelected(row);
                       const labelId = `enhanced-table-checkbox-${index}`;
 
                       return (
@@ -176,7 +199,7 @@ export default function CartTable() {
                           role="checkbox"
                           aria-checked={isItemSelected}
                           tabIndex={-1}
-                          key={row.name}
+                          key={index}
                           selected={isItemSelected}
                         >
                           <TableCell padding="checkbox">
@@ -186,26 +209,33 @@ export default function CartTable() {
                               inputProps={{
                                 "aria-labelledby": labelId,
                               }}
-                              onClick={(event) => handleClick(event, row.name)}
+                              onClick={(event) => handleClick(event, row)}
                             />
                           </TableCell>
                           <TableCell component="th" id={labelId} scope="row" align="center">
-                            <img src={row.image} width={100} height={100} alt="" />
+                            <img src={row.productId.image} width={100} height={100} alt="" />
                           </TableCell>
-                          <TableCell align="center">{row.name}</TableCell>
-                          <TableCell align="center">{printPriceWithCommas(row.price)}đ</TableCell>
+                          <TableCell align="center">{row.productId.name}</TableCell>
+                          <TableCell align="center">{printPriceWithCommas(row.productId.price)}đ</TableCell>
+                          <TableCell align="center">{printPriceWithCommas(row.size)}</TableCell>
                           <TableCell align="center">
                             <Stack direction="row" spacing={2} alignItems="center" justifyContent="center">
-                              <IconButton>
+                              <IconButton
+                                onClick={() => debouncedClick(clicks, row.productId._id, row.size, row.quantity + 1)}
+                              >
                                 <AddIcon />
                               </IconButton>
-                              <Typography>{row.amount}</Typography>
-                              <IconButton>
+                              <Typography>{row.quantity}</Typography>
+                              <IconButton
+                                onClick={() => debouncedClick(clicks, row.productId._id, row.size, row.quantity - 1)}
+                              >
                                 <RemoveIcon />
                               </IconButton>
                             </Stack>
                           </TableCell>
-                          <TableCell align="center">{printPriceWithCommas(row.price * row.amount)}đ</TableCell>
+                          <TableCell align="center">
+                            {printPriceWithCommas(row.productId.price * row.quantity)}đ
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -250,7 +280,7 @@ export default function CartTable() {
         </>
       )}
 
-      {rows.length === 0 && <EmptyCart />}
+      {rows && rows?.length === 0 && <EmptyCart />}
     </Box>
   );
 }

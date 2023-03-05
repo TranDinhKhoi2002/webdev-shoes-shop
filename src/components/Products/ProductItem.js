@@ -1,7 +1,8 @@
-import { fetchAddToCart } from "@/redux/slices/cart";
+import { addToCart, assignProductsToCart, fetchAddToCart } from "@/redux/slices/cart";
 import { printPriceWithCommas } from "@/utils/printPriceWithCommas";
 import { Box, Button, Grid, Modal, Slider, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/styles";
+import Cookies from "js-cookie";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
@@ -24,15 +25,28 @@ function ProductItem({ product }) {
   const [selectedSize, setSelectedSize] = useState(null);
   const [value, setValue] = useState(1);
 
-  const { name, image, description, price } = product;
+  const { name, image, description, price, _id } = product;
   const theme = useTheme();
   const dispatch = useDispatch();
 
-  const handleAddToCart = async (productId, size, quantity) => {
+  const handleAddToCart = async (product, size, quantity) => {
+    if (!selectedSize) {
+      toast.error("Please choose a size");
+      return;
+    }
+
+    const token = Cookies.get("token");
+    if (!Boolean(token)) {
+      console.log(123);
+      dispatch(addToCart({ productId: product, size, quantity }));
+      return;
+    }
+
     try {
-      const { success } = await dispatch(fetchAddToCart({ productId, size, quantity })).unwrap();
+      const { success, cart } = await dispatch(fetchAddToCart({ productId: product._id, size, quantity })).unwrap();
       if (success) {
         toast.success("Added to cart successfully!!");
+        dispatch(assignProductsToCart({ cart: cart }));
         setModalIsVisible(false);
       }
     } catch (error) {
@@ -71,11 +85,7 @@ function ProductItem({ product }) {
             textOverflow: "ellipsis",
           }}
         >
-          <Link
-            to={`/products/${product._id}`}
-            state={{ product: product }}
-            style={{ color: theme.palette.primary.main }}
-          >
+          <Link to={`/products/${_id}`} state={{ product: product }} style={{ color: theme.palette.primary.main }}>
             {name}
           </Link>
         </Typography>
@@ -111,11 +121,12 @@ function ProductItem({ product }) {
           </Typography>
           <Grid container spacing={2}>
             {product.sizes.map((size) => (
-              <Grid item>
+              <Grid item key={size._id}>
                 <Button
                   variant="outlined"
-                  onClick={handleChangeSize.bind(this, size.name)}
-                  sx={{ border: size.name === selectedSize && 2 }}
+                  disabled={size.quantity === 0}
+                  onClick={handleChangeSize.bind(this, size)}
+                  sx={{ border: size.name === selectedSize?.name && 2 }}
                 >
                   {size.name}
                 </Button>
@@ -127,7 +138,12 @@ function ProductItem({ product }) {
             Quantity:
           </Typography>
           <Stack direction="row" spacing={2}>
-            <Slider value={value} onChange={handleSliderChange} min={1} max={50} />
+            <Slider
+              value={value}
+              onChange={handleSliderChange}
+              min={1}
+              max={selectedSize?.quantity - selectedSize?.sold || 50}
+            />
             <Typography variant="body1" sx={{ marginY: 1 }}>
               {value}
             </Typography>
@@ -137,7 +153,7 @@ function ProductItem({ product }) {
             variant="contained"
             sx={{ mt: 3, py: 1 }}
             fullWidth
-            onClick={handleAddToCart.bind(this, product._id, selectedSize, value)}
+            onClick={handleAddToCart.bind(this, product, selectedSize?.name, value)}
           >
             Add to cart
           </Button>

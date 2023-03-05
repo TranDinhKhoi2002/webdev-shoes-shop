@@ -25,7 +25,13 @@ export const fetchUserLogin = createAsyncThunk("auth/fetchUserLogin", async (for
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    logout(state, action) {
+      Cookies.remove("token");
+      state.currentUser = undefined;
+      state.isAuthenticated = false;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchCurrentUser.fulfilled, (state, { payload }) => {
       const { success, user } = payload;
@@ -56,6 +62,8 @@ const authSlice = createSlice({
     });
   },
 });
+
+export const { logout } = authSlice.actions;
 
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectCurrentUser = (state) => state.auth.currentUser;
