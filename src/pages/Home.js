@@ -112,6 +112,9 @@ function Home() {
                   marginY: 1,
                   backgroundColor: brand.name === currentBrand && theme.palette.secondary.main,
                   color: brand.name === currentBrand && theme.palette.primary.main,
+                  "&:hover": {
+                    color: "white",
+                  },
                 }}
                 onClick={handleChangeBrand.bind(this, brand.name)}
               >
