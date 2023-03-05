@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 function EmptyHistory() {
   return (
-    <Box sx={{ textAlign: "center" }}>
+    <Box sx={{ textAlign: "center", marginY: 20 }}>
       <Typography variant="h3">No history found</Typography>
       <Link to="/">
         <Button
